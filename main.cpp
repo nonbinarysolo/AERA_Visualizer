@@ -75,6 +75,9 @@ int main(int argv, char *args[])
 {
   Q_INIT_RESOURCE(aera_visualizer);
 
+  // Run AERA real quick
+  start_AERA("./submodules/AERA/AERA/settings.xml", "./submodules/AERA/AERA/runtime_out.txt");
+
   QApplication app(argv, args);
 
   // Override the tool tip style with 0 delay.
