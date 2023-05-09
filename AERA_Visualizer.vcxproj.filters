@@ -275,6 +275,30 @@
     <ClCompile Include="graphics-items\instantiated-model-item.cpp">
       <Filter>graphics-items</Filter>
     </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\AERA_main.cpp">
+      <Filter>AERA</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\main.cpp">
+      <Filter>AERA</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\test_mem.cpp">
+      <Filter>AERA</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.cpp">
+      <Filter>AERA\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.cpp">
+      <Filter>AERA\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.cc">
+      <Filter>AERA\TCP\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.cpp">
+      <Filter>AERA\video_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.cpp">
+      <Filter>AERA\video_screen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aera-event.hpp" />
@@ -540,6 +564,33 @@
     <ClInclude Include="graphics-items\instantiated-model-item.hpp">
       <Filter>graphics-items</Filter>
     </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\settings.h">
+      <Filter>AERA</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\test_mem.h">
+      <Filter>AERA</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.h">
+      <Filter>AERA\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.h">
+      <Filter>AERA\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.h">
+      <Filter>AERA\TCP\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\utils.h">
+      <Filter>AERA\TCP\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.h">
+      <Filter>AERA\video_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.h">
+      <Filter>AERA\video_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\AERA_main.h">
+      <Filter>AERA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="images\pause.png">
@@ -605,6 +656,18 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
       <ParseFiles>true</ParseFiles>
     </Filter>
+    <Filter Include="AERA">
+      <UniqueIdentifier>{1700dbb8-d407-4371-8464-3cd5441be005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AERA\TCP">
+      <UniqueIdentifier>{56b30223-17c7-4452-8952-f5a3d1d61655}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AERA\TCP\Proto">
+      <UniqueIdentifier>{87fa3823-719a-413e-a685-93bf8e623e16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AERA\video_screen">
+      <UniqueIdentifier>{f6c7d77b-50fa-4ec4-b066-14ac5943103c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="aera-visualizer-window.hpp" />
@@ -617,5 +680,16 @@
     <None Include="submodules\AERA\r_exec\r_exec.vcxproj">
       <Filter>r_exec</Filter>
     </None>
+    <None Include="submodules\AERA\AERA\IODevices\TCP\Proto\ReadMe.md">
+      <Filter>AERA\TCP\Proto</Filter>
+    </None>
+    <None Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.proto">
+      <Filter>AERA\TCP\Proto</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="submodules\AERA\AERA\settings.xml">
+      <Filter>AERA</Filter>
+    </Xml>
   </ItemGroup>
 </Project>
