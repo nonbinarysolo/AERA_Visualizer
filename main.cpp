@@ -67,6 +67,8 @@
 #include <QProxyStyle>
 #include <QProgressDialog>
 
+#include <QtDebug>
+
 using namespace std;
 using namespace std::chrono;
 using namespace aera_visualizer;
@@ -76,7 +78,12 @@ int main(int argv, char *args[])
   Q_INIT_RESOURCE(aera_visualizer);
 
   // Run AERA real quick
-  start_AERA("./submodules/AERA/AERA/settings.xml", "./submodules/AERA/AERA/runtime_out.txt");
+  // failing to load usr_operators.dll. It's brought in by settings.xml
+  int32 ret = start_AERA("./settings.xml", "");
+  qDebug() << "AERA exited with code" << ret;
+
+  if (ret != 0)
+    exit(ret);
 
   QApplication app(argv, args);
 

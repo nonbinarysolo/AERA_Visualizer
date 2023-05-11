@@ -691,5 +691,6 @@
     <Xml Include="submodules\AERA\AERA\settings.xml">
       <Filter>AERA</Filter>
     </Xml>
+    <Xml Include="settings.xml" />
   </ItemGroup>
 </Project>

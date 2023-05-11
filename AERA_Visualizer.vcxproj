@@ -521,6 +521,7 @@
     <None Include="submodules\AERA\r_exec\r_exec.vcxproj" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="settings.xml" />
     <Xml Include="submodules\AERA\AERA\settings.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
