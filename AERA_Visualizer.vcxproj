@@ -189,6 +189,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -354,6 +355,10 @@
     <ClCompile Include="submodules\AERA\submodules\CoreLibrary\CoreLibrary\xml_parser.cpp" />
     <ClCompile Include="submodules\AERA\usr_operators\auto_focus_callback.cpp" />
     <ClCompile Include="find-dialog.cpp" />
+    <ClCompile Include="submodules\AERA\usr_operators\Callbacks\callbacks.cpp" />
+    <ClCompile Include="submodules\AERA\usr_operators\Operators\operators.cpp" />
+    <ClCompile Include="submodules\AERA\usr_operators\TestProgram\test_program.cpp" />
+    <ClCompile Include="submodules\AERA\usr_operators\usr_operators.cpp" />
     <ClCompile Include="views\explanation-log.cpp" />
     <ClCompile Include="views\semantics.cpp" />
   </ItemGroup>
@@ -361,6 +366,11 @@
     <QtRcc Include="aera_visualizer.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="submodules\AERA\usr_operators\Callbacks\callbacks.h" />
+    <ClInclude Include="submodules\AERA\usr_operators\Operators\operators.h" />
+    <ClInclude Include="submodules\AERA\usr_operators\TestProgram\test_program.h" />
+    <ClInclude Include="submodules\AERA\usr_operators\types.h" />
+    <ClInclude Include="submodules\AERA\usr_operators\usr_operators.h" />
     <QtMoc Include="views\semantics.hpp">
       <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING;WIN64;_DEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;EXECUTIVE_EXPORTS;CORELIBRARY_EXPORTS;WITH_DETAIL_OID;VISUALIZER_REMOTE;%(PreprocessorDefinitions)</Define>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING;WIN64;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;EXECUTIVE_EXPORTS;CORELIBRARY_EXPORTS;WITH_DETAIL_OID;VISUALIZER_REMOTE;%(PreprocessorDefinitions)</Define>
