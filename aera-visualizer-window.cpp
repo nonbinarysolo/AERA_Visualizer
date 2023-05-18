@@ -1991,6 +1991,7 @@ void AeraVisualizerWindow::createActions()
 {
   exitAction_ = new QAction(tr("E&xit"), this);
   exitAction_->setShortcuts(QKeySequence::Quit);
+  exitAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
   connect(exitAction_, SIGNAL(triggered()), this, SLOT(close()));
 
   zoomInAction_ = new QAction(QIcon(":/images/zoom-in.png"), tr("Zoom In"), this);
