@@ -112,7 +112,7 @@ int main(int argv, char *args[])
   QSettings::setDefaultFormat(QSettings::IniFormat);
 
   QSettings preferences;
-
+  /*
   QString settingsFilePath0 = preferences.value("settingsFilePath").toString();
   if (settingsFilePath0 == "")
     settingsFilePath0 = "../AERA/AERA/settings.xml";
@@ -120,6 +120,8 @@ int main(int argv, char *args[])
     "Open AERA settings XML file", settingsFilePath0, "XML Files (*.xml);;All Files (*.*)");
   if (settingsFilePath == "")
     return 0;
+    */
+  QString settingsFilePath = "./settings.xml";
   preferences.setValue("settingsFilePath", settingsFilePath);
 
   Settings settings;
