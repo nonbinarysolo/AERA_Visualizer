@@ -53,7 +53,7 @@
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 #include "aera-visualizer-window.hpp"
-#include "explanation-log-window.hpp"
+#include "views/explanation-log.hpp"
 #include "find-dialog.hpp"
 #include "submodules/AERA/AERA/settings.h"
 
@@ -69,6 +69,23 @@
 using namespace std;
 using namespace std::chrono;
 using namespace aera_visualizer;
+
+/* To Do
+To Implement
+- Clicking "Focus On", etc. buttons should open relevant view
+- Dockable widgets need padding for mainwindow borders
+- Docked tabs should be at the top of the view
+- Reorganize references to semantics view's modelsScene_, it should be more self-contained
+
+Issues
+- Main and model scene widths need to be more flexible
+  - Especially when window not maximized
+- Width setting should be proportional to window size, not absolute
+
+Crashes
+- 
+
+*/
 
 int main(int argv, char *args[])
 {
@@ -161,23 +178,7 @@ int main(int argv, char *args[])
     return -1;
 
   mainWindow.setWindowTitle(QString("AERA Visualizer - ") + QFileInfo(settings.source_file_name_.c_str()).fileName());
-  QScreen* screen = QGuiApplication::primaryScreen();
-  int availableHeight = screen->availableSize().height();
-  int availableWidth = screen->availableSize().width();
-  const int titleBarHeight = 35;
-  const int explanationLogWindowWidth = 315;
-  const int left = 0;
-  const int top = titleBarHeight;
-  const int width = availableWidth - explanationLogWindowWidth;
-  const int height = availableHeight - titleBarHeight;
-  mainWindow.setGeometry(left, top, width, height);
-
-  auto explanationLogWindow = new ExplanationLogWindow(&mainWindow, replicodeObjects);
-  mainWindow.setExplanationLogWindow(explanationLogWindow);
-  // Disable the close button for the child window.
-  explanationLogWindow->setWindowFlag(Qt::WindowCloseButtonHint, false);
-  explanationLogWindow->setGeometry(left + width, top, explanationLogWindowWidth, height);
-  explanationLogWindow->show();
+  mainWindow.setWindowState(Qt::WindowMaximized);
 
   // Set up the Find dialog but don't display it
   auto findDialog = new FindDialog(&mainWindow, replicodeObjects);

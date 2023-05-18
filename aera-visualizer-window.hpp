@@ -60,9 +60,11 @@
 #include "aera-event.hpp"
 #include "aera-visualizer-window-base.hpp"
 #include "aera-checkbox.h"
+#include "views/semantics.hpp"
 
 #include <vector>
 #include <QIcon>
+#include <QDockWidget>
 
 class AeraVisualizerScene;
 
@@ -76,7 +78,7 @@ class QProgressDialog;
 
 namespace aera_visualizer {
 
-class ExplanationLogWindow;
+class ExplanationLogView;
 class FindDialog;
 
 /**
@@ -110,12 +112,7 @@ public:
    */
   void addStartupItems();
 
-  void setExplanationLogWindow(ExplanationLogWindow* explanationLogWindow)
-  {
-    explanationLogWindow_ = explanationLogWindow;
-  }
-
-  ExplanationLogWindow* getExplanationLogWindow() { return explanationLogWindow_;  }
+  ExplanationLogView* getExplanationLogView() { return explanationLogView_;  }
 
   void setFindWindow(FindDialog* zoomToWindow)
   {
@@ -194,7 +191,7 @@ public:
   }
 
   AeraVisualizerScene* getModelsScene() {
-    return modelsScene_;
+    return semanticsView_->getModelsScene();
   }
 
 protected:
@@ -231,7 +228,7 @@ protected:
    */
   core::Timestamp unstepEvent(core::Timestamp minimumTime, bool& foundGraphicsItem);
 
-  ExplanationLogWindow* explanationLogWindow_;
+  ExplanationLogView* explanationLogView_;
   FindDialog* findDialog_;
 
 private slots:
@@ -245,9 +242,12 @@ private slots:
 
 private:
   friend class AeraVisualizerWindowBase;
+  void createDockWidgets();
   void createActions();
   void createMenus();
   void createToolbars();
+
+  QToolBar* timelineControls_;
 
   /**
    * Get the time stamp from the decimal strings of seconds, milliseconds and
@@ -295,9 +295,11 @@ private:
   void timerEvent(QTimerEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
-  AeraVisualizerScene* modelsScene_;
   AeraVisualizerScene* mainScene_;
   AeraVisualizerScene* selectedScene_;
+
+  SemanticsView* semanticsView_;
+  QDockWidget* playerControlView_;
 
   QAction* exitAction_;
   QAction* zoomInAction_;
