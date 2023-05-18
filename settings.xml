@@ -5,7 +5,7 @@
 	  io_device="test_mem"
   />
   <Load
-    usr_operator_path="./x64/Debug/usr_operators.dll"
+    usr_operator_path="./usr_operators.dll"
     usr_class_path="submodules/AERA/AERA/replicode_v1.2/user.classes.replicode"
     source_file_name="submodules/AERA/AERA/replicode_v1.2/ball.external.replicode"
   />
@@ -43,7 +43,7 @@
       decompilation_file_path="decompiled_objects.txt"
       ignore_named_objects="no"
       write_objects="no"
-      objects_path="submodules/AERA/AERA/objects.replicode.image"
+      objects_path="../AERA/objects.replicode.image"
       test_objects="no"
     />
   </Debug>
@@ -53,7 +53,7 @@
       decompile_models="yes"
       ignore_named_models="no"
       write_models="no"
-      models_path="submodules/AERA/AERA/models.replicode.image"
+      models_path="../AERA/models.replicode.image"
       test_models="no"
     />
   </Run>

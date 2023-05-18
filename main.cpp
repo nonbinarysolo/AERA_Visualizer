@@ -77,14 +77,6 @@ int main(int argv, char *args[])
 {
   Q_INIT_RESOURCE(aera_visualizer);
 
-  // Run AERA real quick
-  // failing to load usr_operators.dll. It's brought in by settings.xml
-  int32 ret = start_AERA("./settings.xml", "");
-  qDebug() << "AERA exited with code" << ret;
-
-  if (ret != 0)
-    exit(ret);
-
   QApplication app(argv, args);
 
   // Override the tool tip style with 0 delay.
@@ -110,25 +102,22 @@ int main(int argv, char *args[])
 
   // Configure QSettings to use .ini files to store settings
   QSettings::setDefaultFormat(QSettings::IniFormat);
-
-  QSettings preferences;
-  /*
-  QString settingsFilePath0 = preferences.value("settingsFilePath").toString();
-  if (settingsFilePath0 == "")
-    settingsFilePath0 = "../AERA/AERA/settings.xml";
-  QString settingsFilePath = QFileDialog::getOpenFileName(NULL,
-    "Open AERA settings XML file", settingsFilePath0, "XML Files (*.xml);;All Files (*.*)");
-  if (settingsFilePath == "")
-    return 0;
-    */
+  
+  // Read the settings file in the visualizer project directory
   QString settingsFilePath = "./settings.xml";
-  preferences.setValue("settingsFilePath", settingsFilePath);
 
   Settings settings;
   if (!settings.load(settingsFilePath.toStdString().c_str())) {
     QMessageBox::information(NULL, "XML Error", "Cannot load XML file " + settingsFilePath, QMessageBox::Ok);
     return -1;
   }
+
+  // Run AERA real quick
+  int32 ret = start_AERA(settingsFilePath.toStdString().c_str(), "");
+  QMessageBox::information(NULL, "AERA", "AERA exited with code " + QString::fromStdString(std::to_string(ret)));
+
+  if (ret != 0)
+    exit(ret);
 
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();

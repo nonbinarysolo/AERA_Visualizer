@@ -532,8 +532,12 @@
     <None Include="submodules\AERA\r_exec\r_exec.vcxproj" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="settings.xml" />
-    <Xml Include="submodules\AERA\AERA\settings.xml" />
+    <Xml Include="settings.xml">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Xml>
+    <Xml Include="submodules\AERA\AERA\settings.xml">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
