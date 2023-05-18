@@ -5,7 +5,7 @@
 //_/_/ Copyright (c) 2018-2023 Jeff Thompson
 //_/_/ Copyright (c) 2018-2023 Kristinn R. Thorisson
 //_/_/ Copyright (c) 2018-2023 Icelandic Institute for Intelligent Machines
-//_/_/ Copyright (c) 2021 Karl Asgeir Geirsson
+//_/_/ Copyright (c) 2023 Chloe Schaff
 //_/_/ http://www.iiim.is
 //_/_/
 //_/_/ --- Open-Source BSD License, with CADIA Clause v 1.0 ---
@@ -52,47 +52,47 @@
 //_/_/ 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-#include <regex>
-#include <QMenu>
-#include <QRegularExpression>
-#include "../views/explanation-log.hpp"
-#include "../aera-visualizer-window.hpp"
-#include "../submodules/AERA/r_exec/factory.h"
-#include "aera-visualizer-scene.hpp"
-#include "instantiated-composite-state-item.hpp"
-#include "composite-state-prediction-item.hpp"
+#ifndef SEMANTICS_HPP
+#define SEMANTICS_HPP
 
-using namespace std;
-using namespace core;
-using namespace r_code;
-using namespace r_exec;
+#include <QDockWidget>
+#include "../replicode-objects.hpp"
+#include "../graphics-items/aera-visualizer-scene.hpp"
 
 namespace aera_visualizer {
 
-CompositeStatePredictionItem::CompositeStatePredictionItem(
-  CompositeStateSimulatedPredictionReduction* compositeStateReduction, 
-  ReplicodeObjects& replicodeObjects, AeraVisualizerScene* parent)
-: ExpandableGoalOrPredItem(compositeStateReduction, replicodeObjects,
-    "Comp. State " + makeHtmlLink(compositeStateReduction->compositeState_, replicodeObjects) + " " + RightDoubleArrowHtml,
-    parent),
-  compositeStateReduction_(compositeStateReduction)
+	/**
+ * SemanticsView extends QDockWidget to allow the user to
+ * rearrange it as needed
+ */
+class SemanticsView : public QDockWidget
 {
+	Q_OBJECT
+
+public:
+	/**
+	 * Create a SemanticsView.
+	 * \param replicodeObjects The ReplicodeObjects used to find objects.
+	 * \param mainWindow The main parent window for this window.
+	 */
+	SemanticsView(ReplicodeObjects replicodeObjects, AeraVisualizerWindow* mainWindow);
+
+	// Make this available so it can be updated by the main window
+	AeraVisualizerScene* getModelsScene() { return modelsScene_; }
+
+private slots:
+	void zoomIn();
+	void zoomOut();
+	void zoomHome();
+
+private:
+	AeraVisualizerScene* modelsScene_;
+
+	QAction* zoomInAction_;
+	QAction* zoomOutAction_;
+	QAction* zoomHomeAction_;
+	
+};
 }
 
-void CompositeStatePredictionItem::textItemLinkActivated(const QString& link)
-{
-  if (link == "#this") {
-    auto menu = new QMenu();
-    menu->addAction("Zoom to This", [=]() { parent_->zoomToItem(this); });
-    menu->addAction("Focus on This", [=]() { parent_->focusOnItem(this); });
-    menu->addAction("Center on This", [=]() { parent_->centerOnItem(this); });
-
-    menu->exec(QCursor::pos() - QPoint(10, 10));
-    delete menu;
-  }
-  else
-    // For #expand, #detail_oid- and others, defer to the base class.
-    ExpandableGoalOrPredItem::textItemLinkActivated(link);
-}
-
-}
+#endif
