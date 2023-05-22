@@ -65,6 +65,7 @@
 #include <QScreen>
 #include <QProxyStyle>
 #include <QProgressDialog>
+#include <QPalette>
 
 using namespace std;
 using namespace std::chrono;
@@ -105,6 +106,11 @@ int main(int argv, char *args[])
     }
   };
   app.setStyle(new MyProxyStyle(qApp->style()));
+
+  //QPalette darkMode = QPalette();
+  //darkMode.setColor(QPalette::Window, QColor(38, 50, 56));
+  //darkMode.setColor(QPalette::WindowText, QColor(236, 239, 241));
+  //app.setPalette(darkMode);
 
   // Globally remove the '?' from the QInputDialog title bar.
   QApplication::setAttribute(Qt::AA_DisableWindowContextHelpButton);
