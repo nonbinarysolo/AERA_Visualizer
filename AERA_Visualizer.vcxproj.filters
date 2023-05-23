@@ -278,9 +278,6 @@
     <ClCompile Include="submodules\AERA\AERA\AERA_main.cpp">
       <Filter>AERA</Filter>
     </ClCompile>
-    <ClCompile Include="submodules\AERA\AERA\main.cpp">
-      <Filter>AERA</Filter>
-    </ClCompile>
     <ClCompile Include="submodules\AERA\AERA\test_mem.cpp">
       <Filter>AERA</Filter>
     </ClCompile>
@@ -310,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="submodules\AERA\usr_operators\Callbacks\callbacks.cpp">
       <Filter>usr_operators\Callbacks</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\main.cpp">
+      <Filter>AERA</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

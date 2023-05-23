@@ -113,12 +113,10 @@ int main(int argv, char *args[])
   }
 
   // Run AERA real quick
-  int32 ret = start_AERA(settingsFilePath.toStdString().c_str(), "");
-  QMessageBox::information(NULL, "AERA", "AERA exited with code " + QString::fromStdString(std::to_string(ret)));
-
-  if (ret != 0)
-    exit(ret);
-
+  AERA_instance AERA(settingsFilePath.toStdString().c_str(), "");
+  AERA.run();
+  AERA.stop();
+  
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();
   string runtimeOutputFilePath = settingsFileDir.absoluteFilePath(settings.runtime_output_file_path_.c_str()).toStdString();
