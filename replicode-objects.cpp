@@ -58,6 +58,7 @@
 #include "submodules/AERA/r_comp/compiler.h"
 #include "submodules/AERA/r_comp/decompiler.h"
 #include "submodules/AERA/r_exec/model_base.h"
+#include "submodules/AERA/AERA/AERA_main.h"
 #include "replicode-objects.hpp"
 #include <QApplication>
 #include <QProgressDialog>
@@ -273,6 +274,169 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
 
   return "";
 }
+
+
+string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QProgressDialog& progress)
+{
+  basePeriod_ = basePeriod;
+  
+  // Retreve metadata from the AERA instance
+  r_comp::Metadata metadata = aera->getMetadata();
+
+  progress.setLabelText(getProgressLabelText("Preprocessing code (1 of 2)"));
+  QApplication::processEvents();
+  if (progress.wasCanceled())
+    return "cancel";
+
+  // Not sure this is needed
+  //InitOpcodes(metadata);
+  
+  // Now() is called when constructing model controllers.
+  r_exec::Now = Time::Get;
+
+  map<string, uint32> objectOids;
+  map<string, uint64> objectDetailOids;
+
+  // Not sure where to get these
+  //auto decompiledOut = processDecompiledObjects(decompiledFilePath, objectOids, objectDetailOids);
+
+  //Compiler compiler(true);
+  r_comp::Image image = aera->getModelsImage();
+
+  // Get OIDs and detail OIDs
+  for (uint16 i = 0; i < image.code_segment_.objects_.size(); ++i) {
+    auto object = image.code_segment_.objects_[i];
+    string name = "beans" + std::to_string(i);
+    objectOids[name] = object->oid_;
+    objectDetailOids[name] = object->detail_oid_;
+  }
+
+  progress.setLabelText(getProgressLabelText("Compiling code"));
+  QApplication::processEvents();
+  if (progress.wasCanceled())
+    return "cancel";
+
+  // Transfer objects from the compiler image to imageObjects.
+  resized_vector<Code*> imageObjects;
+  // tempMem is only used internally for calling build_object.
+  MemExec<LObject, MemStatic> tempMem;
+  image.get_objects(&tempMem, imageObjects);
+
+  progress.setLabelText(getProgressLabelText("Postprocessing code"));
+  // We update progress for 3 loops of imageObjects.size().
+  progress.setMaximum(imageObjects.size() * 3);
+  // Set the OIDs and detail OIDs of objects in imageObjects based on the decompiled output.
+  // Set up objectLabel_ and labelObject_ based on the object in imageObjects.
+  for (auto i = 0; i < imageObjects.size(); ++i) {
+    if (progress.wasCanceled())
+      return "cancel";
+    progress.setValue(i);
+    if (i % 100 == 0)
+      QApplication::processEvents();
+
+    string label = "";// compiler.getObjectName(i);
+    if (label != "") {
+      objectLabel_[imageObjects[i]] = label;
+      labelObject_[label] = imageObjects[i];
+
+      auto oidEntry = objectOids.find(label);
+      if (oidEntry != objectOids.end())
+        imageObjects[i]->set_oid(oidEntry->second);
+
+      auto detailOidEntry = objectDetailOids.find(label);
+      if (detailOidEntry != objectDetailOids.end())
+        imageObjects[i]->set_detail_oid(detailOidEntry->second);
+    }
+  }
+
+  // Transfer imageObjects to objects_, unpacking and processing as needed.
+  // Imitate _Mem::load.
+  for (uint32 i = 0; i < imageObjects.size(); ++i) {
+    Code* object = imageObjects[i];
+    int32 dummyLocation;
+    objects_.push_back(object, dummyLocation);
+    // We don't need to delete, so don't set the storage index.
+
+    switch (object->code(0).getDescriptor()) {
+    case Atom::MODEL:
+      _Mem::unpack_hlp(object);
+      r_exec::ModelBase::Get()->load(object);
+      break;
+    case Atom::COMPOSITE_STATE:
+      _Mem::unpack_hlp(object);
+      break;
+    case Atom::INSTANTIATED_PROGRAM: // refine the opcode depending on the inputs and the program type.
+      if (object->get_reference(0)->code(0).asOpcode() == Opcodes::Pgm) {
+
+        if (object->get_reference(0)->code(object->get_reference(0)->code(PGM_INPUTS).asIndex()).getAtomCount() == 0)
+          object->code(0) = Atom::InstantiatedInputLessProgram(object->code(0).asOpcode(), object->code(0).getAtomCount());
+      }
+      else
+        object->code(0) = Atom::InstantiatedAntiProgram(object->code(0).asOpcode(), object->code(0).getAtomCount());
+      break;
+    }
+
+    for (auto v = object->views_.begin(); v != object->views_.end(); ++v) {
+
+      // init hosts' member_set.
+      View* view = (View*)*v;
+      view->set_object(object);
+      Group* host = view->get_host();
+
+#if 0 // debug: host is NULL.
+      if (!host->load(view, object))
+        return false;
+#endif
+    }
+  }
+
+  _Mem::init_timestamps(timeReference_, objects_);
+
+  // We have to get the source code by decompiling the packet objects in objects_ (not from
+  // the original decompiled code in decompiledFilePath) because variable names can be different.
+  r_comp::Image packedImage;
+  packedImage.object_names_.symbols_ = image.object_names_.symbols_;
+  packedImage.add_objects(objects_, true);
+
+  Decompiler decompiler;
+  decompiler.init(&metadata);
+
+  // Fill the objectNames map from the image and use it in decompile_references.
+  unordered_map<uint16, std::string> objectNames;
+  for (auto i = 0; i < packedImage.code_segment_.objects_.size(); ++i) {
+    if (progress.wasCanceled())
+      return "cancel";
+    progress.setValue(imageObjects.size() + i);
+    if (i % 100 == 0)
+      QApplication::processEvents();
+
+    objectNames[i] = "beans";// compiler.getObjectName(i);
+  }
+  decompiler.decompile_references(&packedImage, &objectNames);
+
+  for (uint16 i = 0; i < packedImage.code_segment_.objects_.size(); ++i) {
+    if (progress.wasCanceled())
+      return "cancel";
+    progress.setValue(2 * imageObjects.size() + i);
+    if (i % 100 == 0)
+      QApplication::processEvents();
+
+    auto object = getObjectByDetailOid(packedImage.code_segment_.objects_[i]->detail_oid_);
+    if (object) {
+      std::ostringstream decompiledCode;
+      decompiler.decompile_object(i, &decompiledCode, timeReference_, false, false, false);
+      auto source = decompiledCode.str();
+
+      // Strip ending newlines.
+      while (source[source.size() - 1] == '\n')
+        source = source.substr(0, source.size() - 1);
+      objectSourceCode_[object] = source;
+    }
+  }
+  
+  return "";
+}
+
 
 string ReplicodeObjects::processDecompiledObjects(
   string decompiledFilePath, map<string, uint32>& objectOids, map<string, uint64>& objectDetailOids)

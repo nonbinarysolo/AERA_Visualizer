@@ -113,9 +113,9 @@ int main(int argv, char *args[])
   }
 
   // Run AERA real quick
-  AERA_instance AERA(settingsFilePath.toStdString().c_str(), "");
+  AERA_interface AERA(settingsFilePath.toStdString().c_str(), "");
   AERA.run();
-  AERA.stop();
+  //AERA.stop();
   
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();
@@ -143,10 +143,12 @@ int main(int argv, char *args[])
   QApplication::processEvents();
 
   ReplicodeObjects replicodeObjects;
+  /*
   string error = replicodeObjects.init(
     settingsFileDir.absoluteFilePath(settings.usr_class_path_.c_str()).toStdString(), 
     settingsFileDir.absoluteFilePath(settings.decompilation_file_path_.c_str()).toStdString(),
-    microseconds(settings.base_period_), progress);
+    microseconds(settings.base_period_), progress);*/
+  string error = replicodeObjects.init(&AERA, microseconds(settings.base_period_), progress);
   if (error == "cancel")
     return -1;
   if (error != "") {
