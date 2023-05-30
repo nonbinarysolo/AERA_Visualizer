@@ -260,6 +260,7 @@
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.cpp" />
     <ClCompile Include="submodules\AERA\AERA\main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="submodules\AERA\AERA\test_mem.cpp" />
     <ClCompile Include="submodules\AERA\r_code\atom.cpp" />

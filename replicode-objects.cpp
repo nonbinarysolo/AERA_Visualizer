@@ -72,6 +72,8 @@ using namespace r_exec;
 
 namespace aera_visualizer {
 
+  dll_export r_comp::Compiler Compiler;
+
 ReplicodeObjects::ReplicodeObjects()
 : intMemberRegex_("( ?\\d+)")
 {
@@ -137,7 +139,7 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
     return error;
 
   istringstream preprocessedIn(preprocessedOut.str());
-  Compiler compiler(true);
+  r_comp::Compiler compiler(true);
   r_comp::Image image;
 
   progress.setLabelText(getProgressLabelText("Compiling code"));
@@ -300,8 +302,8 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   // Not sure where to get these
   //auto decompiledOut = processDecompiledObjects(decompiledFilePath, objectOids, objectDetailOids);
 
-  //Compiler compiler(true);
-  r_comp::Image image = aera->getModelsImage();
+  r_comp::Image image = aera->getObjectsImage();
+  // TO DO: Get models from ModelBase
 
   // Get OIDs and detail OIDs
   for (uint16 i = 0; i < image.code_segment_.objects_.size(); ++i) {
@@ -310,7 +312,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     objectOids[name] = object->oid_;
     objectDetailOids[name] = object->detail_oid_;
   }
-
+  
   progress.setLabelText(getProgressLabelText("Compiling code"));
   QApplication::processEvents();
   if (progress.wasCanceled())
@@ -334,7 +336,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     if (i % 100 == 0)
       QApplication::processEvents();
 
-    string label = "";// compiler.getObjectName(i);
+    string label = Compiler.getObjectName(i);
     if (label != "") {
       objectLabel_[imageObjects[i]] = label;
       labelObject_[label] = imageObjects[i];
@@ -390,7 +392,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     }
   }
 
-  _Mem::init_timestamps(timeReference_, objects_);
+  //_Mem::init_timestamps(timeReference_, objects_);
 
   // We have to get the source code by decompiling the packet objects in objects_ (not from
   // the original decompiled code in decompiledFilePath) because variable names can be different.
@@ -410,7 +412,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     if (i % 100 == 0)
       QApplication::processEvents();
 
-    objectNames[i] = "beans";// compiler.getObjectName(i);
+    objectNames[i] = Compiler.getObjectName(i);
   }
   decompiler.decompile_references(&packedImage, &objectNames);
 
