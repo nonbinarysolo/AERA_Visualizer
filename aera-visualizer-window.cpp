@@ -1930,6 +1930,21 @@ void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
   event->accept();
 }
 
+void AeraVisualizerWindow::loadNewSeed()
+{
+  //
+}
+
+void AeraVisualizerWindow::openOutput()
+{
+  //
+}
+
+void AeraVisualizerWindow::saveOutput()
+{
+  //
+}
+
 void AeraVisualizerWindow::zoomIn()
 {
   selectedScene_->scaleViewBy(1.09);
@@ -1976,9 +1991,36 @@ void AeraVisualizerWindow::fitAll() {
 
 void AeraVisualizerWindow::createActions()
 {
+  newInstanceAction_ = new QAction(tr("&New AERA Instance"), this);
+  newInstanceAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+  newInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
+  connect(newInstanceAction_, SIGNAL(triggered()), this, SLOT(loadNewSeed()));
+
+  loadOutputAction_ = new QAction(tr("&Open AERA Output"), this);
+  loadOutputAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+  loadOutputAction_->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+  connect(loadOutputAction_, SIGNAL(triggered()), this, SLOT(openOutput()));
+
+  saveOutputAction_ = new QAction(tr("&Save AERA Output"), this);
+  saveOutputAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+  saveOutputAction_->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
+  connect(saveOutputAction_, SIGNAL(triggered()), this, SLOT(saveOutput()));
+
   exitAction_ = new QAction(tr("E&xit"), this);
   exitAction_->setShortcuts(QKeySequence::Quit);
+  exitAction_->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
   connect(exitAction_, SIGNAL(triggered()), this, SLOT(close()));
+
+  resetAERAInstanceAction_ = new QAction(tr("&Reset AERA Instance"), this);
+  resetAERAInstanceAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+  resetAERAInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_DialogResetButton));
+  resetAERAInstanceAction_->setEnabled(false);
+  //connect(resetAERAInstanceAction_, SIGNAL(triggered()), this, SLOT(close()));
+
+  configureAERAInstanceAction_ = new QAction(tr("&Configure AERA Instance"), this);
+  configureAERAInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_FileDialogInfoView));
+  configureAERAInstanceAction_->setEnabled(false);
+  //connect(configureAERAInstanceAction_, SIGNAL(triggered()), this, SLOT(close()));
 
   zoomInAction_ = new QAction(QIcon(":/images/zoom-in.png"), tr("Zoom In"), this);
   zoomInAction_->setStatusTip(tr("Zoom In"));
@@ -2019,7 +2061,14 @@ void AeraVisualizerWindow::createActions()
 void AeraVisualizerWindow::createMenus()
 {
   QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
+  fileMenu->addAction(newInstanceAction_);
+  fileMenu->addAction(loadOutputAction_);
+  fileMenu->addAction(saveOutputAction_);
   fileMenu->addAction(exitAction_);
+
+  QMenu* AERAMenu = menuBar()->addMenu(tr("&AERA"));
+  AERAMenu->addAction(resetAERAInstanceAction_);
+  AERAMenu->addAction(configureAERAInstanceAction_);
 
   QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
   viewMenu->addAction(zoomHomeAction_);

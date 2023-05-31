@@ -115,7 +115,6 @@ int main(int argv, char *args[])
   // Run AERA real quick
   AERA_interface AERA(settingsFilePath.toStdString().c_str(), "");
   AERA.run();
-  //AERA.stop();
   
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();

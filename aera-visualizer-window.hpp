@@ -235,6 +235,9 @@ protected:
   FindDialog* findDialog_;
 
 private slots:
+  void loadNewSeed();
+  void openOutput();
+  void saveOutput();
   void zoomIn();
   void zoomOut();
   void zoomHome();
@@ -299,7 +302,12 @@ private:
   AeraVisualizerScene* mainScene_;
   AeraVisualizerScene* selectedScene_;
 
+  QAction* newInstanceAction_;
+  QAction* loadOutputAction_;
+  QAction* saveOutputAction_;
   QAction* exitAction_;
+  QAction* resetAERAInstanceAction_;
+  QAction* configureAERAInstanceAction_;
   QAction* zoomInAction_;
   QAction* zoomOutAction_;
   QAction* zoomHomeAction_;
