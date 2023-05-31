@@ -89,10 +89,9 @@ class AeraVisualizerWindow : public AeraVisualizerWindowBase
 
 public:
   /**
-   * Create an AeraVisualizerWindow. After creating the window, call addEvents().
-   * \param replicodeObjects The ReplicodeObjects used to find objects.
+   * Create an AeraVisualizerWindow
    */
-  AeraVisualizerWindow(ReplicodeObjects& replicodeObjects);
+  AeraVisualizerWindow();
 
   /**
    * Scan the runtimeOutputFilePath and add to startupEvents_ and events_. Call this once after creating the window.

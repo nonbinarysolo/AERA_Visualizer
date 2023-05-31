@@ -74,6 +74,11 @@ public:
    */
   ExplanationLogWindow(AeraVisualizerWindow* mainWindow);
 
+  // Used to update the replicodeObjects during live operation
+  void setReplicodeObjects(ReplicodeObjects* replicodeObjects) {
+    replicodeObjects_ = replicodeObjects;
+  }
+
   void appendHtml(const QString& html)
   {
     // TODO: Does QTextBrowser have an actual append operation?
@@ -82,10 +87,6 @@ public:
   }
 
   void appendHtml(const std::string& html) { appendHtml(QString(html.c_str())); }
-
-  void setReplicodeObjects(ReplicodeObjects* replicodeObjects) {
-    replicodeObjects_ = replicodeObjects;
-  }
 
 private slots:
   void textBrowserAnchorClicked(const QUrl& url);

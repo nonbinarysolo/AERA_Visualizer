@@ -102,66 +102,10 @@ int main(int argv, char *args[])
 
   // Configure QSettings to use .ini files to store settings
   QSettings::setDefaultFormat(QSettings::IniFormat);
-  
-  // Read the settings file in the visualizer project directory
-  QString settingsFilePath = "./settings.xml";
 
-  Settings settings;
-  if (!settings.load(settingsFilePath.toStdString().c_str())) {
-    QMessageBox::information(NULL, "XML Error", "Cannot load XML file " + settingsFilePath, QMessageBox::Ok);
-    return -1;
-  }
-
-  // Run AERA real quick
-  AERA_interface AERA(settingsFilePath.toStdString().c_str(), "");
-  AERA.run();
-  
-  // Files are relative to the directory of settingsFilePath.
-  QDir settingsFileDir = QFileInfo(settingsFilePath).dir();
-  string runtimeOutputFilePath = settingsFileDir.absoluteFilePath(settings.runtime_output_file_path_.c_str()).toStdString();
-  {
-    // Test opening the file now so we can exit on error.
-    ifstream testOpen(runtimeOutputFilePath);
-    if (!testOpen) {
-      QMessageBox::information(NULL, "File Error",
-        QString("Can't open debug stream output file: ") + runtimeOutputFilePath.c_str(), QMessageBox::Ok);
-      return -1;
-    }
-  }
-
-  // Create the progress dialog to show while compiling and reading the runtime output.
-  QProgressDialog progress("", "Cancel", 0, 100);
-  progress.setWindowModality(Qt::WindowModal);
-  // Remove the '?' in the title.
-  progress.setWindowFlags(progress.windowFlags() & ~Qt::WindowContextHelpButtonHint);
-  progress.setWindowIcon(QIcon(":/images/app.ico"));
-  progress.setWindowTitle("Initializing");
-  progress.setAutoReset(false);
-  progress.setAutoClose(false);
-  progress.show();
-  QApplication::processEvents();
-
-  ReplicodeObjects replicodeObjects;
-  /*
-  string error = replicodeObjects.init(
-    settingsFileDir.absoluteFilePath(settings.usr_class_path_.c_str()).toStdString(), 
-    settingsFileDir.absoluteFilePath(settings.decompilation_file_path_.c_str()).toStdString(),
-    microseconds(settings.base_period_), progress);*/
-  string error = replicodeObjects.init(&AERA, microseconds(settings.base_period_), progress);
-  if (error == "cancel")
-    return -1;
-  if (error != "") {
-    QMessageBox::information(NULL, "Compiler Error", error.c_str(), QMessageBox::Ok);
-    return -1;
-  }
-
-  AeraVisualizerWindow mainWindow(replicodeObjects);
+  AeraVisualizerWindow mainWindow;
   mainWindow.setWindowIcon(QIcon(":/images/app.ico"));
-
-  if (!mainWindow.addEvents(runtimeOutputFilePath, progress))
-    return -1;
-
-  mainWindow.setWindowTitle(QString("AERA Visualizer - ") + QFileInfo(settings.source_file_name_.c_str()).fileName());
+  
   QScreen* screen = QGuiApplication::primaryScreen();
   int availableHeight = screen->availableSize().height();
   int availableWidth = screen->availableSize().width();
@@ -174,7 +118,6 @@ int main(int argv, char *args[])
   mainWindow.setGeometry(left, top, width, height);
 
   auto explanationLogWindow = new ExplanationLogWindow(&mainWindow);
-  explanationLogWindow->setReplicodeObjects(&replicodeObjects);
   mainWindow.setExplanationLogWindow(explanationLogWindow);
   // Disable the close button for the child window.
   explanationLogWindow->setWindowFlag(Qt::WindowCloseButtonHint, false);
@@ -182,10 +125,8 @@ int main(int argv, char *args[])
   explanationLogWindow->show();
 
   // Set up the Find dialog but don't display it
-  auto findDialog = new FindDialog(&mainWindow, replicodeObjects);
+  auto findDialog = new FindDialog(&mainWindow);
   mainWindow.setFindWindow(findDialog);
-  
-  progress.close();
   mainWindow.show();
   mainWindow.addStartupItems();
 
