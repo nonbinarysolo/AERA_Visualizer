@@ -167,9 +167,9 @@ const QString AeraVisualizerWindow::SettingsKeyPredictedInstantiatedCompositeSta
 const QString AeraVisualizerWindow::SettingsKeyRequirementsVisible = "requirementsVisible";
 
 AeraVisualizerWindow::AeraVisualizerWindow(ReplicodeObjects& replicodeObjects)
-: AeraVisualizerWindowBase(0, replicodeObjects),
+: AeraVisualizerWindowBase(0),
   iNextEvent_(0), explanationLogWindow_(0),
-  essencePropertyObject_(replicodeObjects_.getObject("essence")),
+  essencePropertyObject_(NULL),//(replicodeObjects_.getObject("essence")),
   hoverHighlightItem_(0),
   phasedOutModelColor_(255, 192, 192),
   showRelativeTime_(true),

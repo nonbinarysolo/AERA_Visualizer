@@ -101,7 +101,7 @@ protected:
    * \param runtimeOutputFilePath The file path of the runtime output,
    * typically ending in "runtime_out.txt".
    */
-  AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow, ReplicodeObjects& replicodeObjects);
+  AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow);
 
   /**
    * Get the player control panel widget which has a play button, slider bar and time label.
@@ -110,7 +110,6 @@ protected:
   QWidget* getPlayerControlPanel() { return playerControlPanel_;  }
 
   AeraVisualizerWindow* mainWindow_;
-  ReplicodeObjects& replicodeObjects_;
 
 private slots:
   void playPauseButtonClicked();

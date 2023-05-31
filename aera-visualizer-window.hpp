@@ -298,6 +298,8 @@ private:
   void timerEvent(QTimerEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
+  ReplicodeObjects replicodeObjects_;
+
   AeraVisualizerScene* modelsScene_;
   AeraVisualizerScene* mainScene_;
   AeraVisualizerScene* selectedScene_;

@@ -63,10 +63,9 @@ using namespace r_code;
 
 namespace aera_visualizer {
 
-AeraVisualizerWindowBase::AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow, ReplicodeObjects& replicodeObjects)
+AeraVisualizerWindowBase::AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow)
 : QMainWindow(mainWindow),
-  mainWindow_(mainWindow),
-  replicodeObjects_(replicodeObjects)
+  mainWindow_(mainWindow)
 {
   createPlayerControlPanel();
 

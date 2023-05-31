@@ -72,7 +72,7 @@ public:
    * \param parent The main parent window for this window.
    * \param replicodeObjects The ReplicodeObjects used to find objects.
    */
-  ExplanationLogWindow(AeraVisualizerWindow* mainWindow, ReplicodeObjects& replicodeObjects);
+  ExplanationLogWindow(AeraVisualizerWindow* mainWindow);
 
   void appendHtml(const QString& html)
   {
@@ -83,10 +83,15 @@ public:
 
   void appendHtml(const std::string& html) { appendHtml(QString(html.c_str())); }
 
+  void setReplicodeObjects(ReplicodeObjects* replicodeObjects) {
+    replicodeObjects_ = replicodeObjects;
+  }
+
 private slots:
   void textBrowserAnchorClicked(const QUrl& url);
 
 private:
+  ReplicodeObjects* replicodeObjects_;
   /**
    * ExplanationLogWindow::TextBrowser extends QTextBrowser so that we can override its
    * mouseMoveEvent.

@@ -173,7 +173,8 @@ int main(int argv, char *args[])
   const int height = availableHeight - titleBarHeight;
   mainWindow.setGeometry(left, top, width, height);
 
-  auto explanationLogWindow = new ExplanationLogWindow(&mainWindow, replicodeObjects);
+  auto explanationLogWindow = new ExplanationLogWindow(&mainWindow);
+  explanationLogWindow->setReplicodeObjects(&replicodeObjects);
   mainWindow.setExplanationLogWindow(explanationLogWindow);
   // Disable the close button for the child window.
   explanationLogWindow->setWindowFlag(Qt::WindowCloseButtonHint, false);
