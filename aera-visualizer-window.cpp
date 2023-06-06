@@ -81,7 +81,7 @@
 #include "graphics-items/simulation-commit-item.hpp"
 #include "submodules/AERA/r_exec/opcodes.h"
 #include "submodules/AERA/AERA/settings.h"
-#include "submodules/AERA/AERA/AERA_main.h"
+#include "submodules/AERA/AERA/main.h"
 
 #include "aera-visualizer-window.hpp"
 #include "find-dialog.hpp"
@@ -222,6 +222,8 @@ AeraVisualizerWindow::AeraVisualizerWindow()
 
   setWindowTitle(tr("AERA Visualizer"));
   setUnifiedTitleAndToolBarOnMac(true);
+
+  loadNewSeed(); // TO DO: Remove this after done debugging
 }
 
 bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgressDialog& progress)
@@ -354,6 +356,9 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
         startupEvents_.push_back(make_shared <NewModelEvent>(
           replicodeObjects_.getTimeReference(), model, strength, evidenceCount, successRate, stoll(matches[2].str())));
       }
+      else {
+        QMessageBox::information(NULL, "Debug", "Model not found: " + QString::fromStdString(matches[1]));
+      }
 
       continue;
     }
@@ -387,6 +392,8 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
       if (model)
         events_.push_back(make_shared<NewModelEvent>(
           timestamp, model, strength, evidenceCount, successRate, stoll(matches[2].str())));
+      else
+        QMessageBox::information(NULL, "Debug", "New model not found: " + QString::fromStdString(matches[1]));
     }
     else if (regex_search(lineAfterTimestamp, matches, setEvidenceCountAndSuccessRateRegex)) {
       auto model = replicodeObjects_.getObject(stoul(matches[1].str()));
@@ -416,6 +423,8 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
       if (compositeState)
         events_.push_back(make_shared<NewCompositeStateEvent>(
           timestamp, compositeState, stoll(matches[2].str())));
+      else
+        QMessageBox::information(NULL, "Debug", "New CST not found: " + QString::fromStdString(matches[1]));
     }
     else if (regex_search(lineAfterTimestamp, matches, autofocusNewObjectRegex)) {
       auto fromObject = replicodeObjects_.getObject(stoul(matches[1].str()));

@@ -600,9 +600,6 @@
     <ClInclude Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.h">
       <Filter>AERA\video_screen</Filter>
     </ClInclude>
-    <ClInclude Include="submodules\AERA\AERA\AERA_main.h">
-      <Filter>AERA</Filter>
-    </ClInclude>
     <ClInclude Include="submodules\AERA\usr_operators\types.h">
       <Filter>usr_operators</Filter>
     </ClInclude>
@@ -617,6 +614,9 @@
     </ClInclude>
     <ClInclude Include="submodules\AERA\usr_operators\Callbacks\callbacks.h">
       <Filter>usr_operators\Callbacks</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\main.h">
+      <Filter>AERA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

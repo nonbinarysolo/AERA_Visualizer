@@ -56,7 +56,7 @@
 #include "explanation-log-window.hpp"
 #include "find-dialog.hpp"
 #include "submodules/AERA/AERA/settings.h"
-#include "submodules/AERA/AERA/AERA_main.h"
+#include "submodules/AERA/AERA/main.h"
 
 #include <QApplication>
 #include <QCoreApplication>

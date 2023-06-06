@@ -59,10 +59,12 @@
 #include "submodules/AERA/r_comp/compiler.h"
 #include "submodules/AERA/r_comp/decompiler.h"
 #include "submodules/AERA/r_exec/model_base.h"
-#include "submodules/AERA/AERA/AERA_main.h"
+#include "submodules/AERA/AERA/main.h"
 #include "replicode-objects.hpp"
 #include <QApplication>
 #include <QProgressDialog>
+
+#include <QMessageBox>
 
 using namespace std;
 using namespace std::chrono;
@@ -286,13 +288,13 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   // Retreve metadata from the AERA instance
   r_comp::Metadata metadata = aera->getMetadata();
 
+  // Dump everything to files so we can process them
+  aera->brainDump();
+
   progress.setLabelText(getProgressLabelText("Preprocessing code (1 of 2)"));
   QApplication::processEvents();
   if (progress.wasCanceled())
     return "cancel";
-
-  // Not sure this is needed
-  //InitOpcodes(metadata);
   
   // Now() is called when constructing model controllers.
   r_exec::Now = Time::Get;
@@ -301,18 +303,26 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   map<string, uint64> objectDetailOids;
 
   // Not sure where to get these
-  //auto decompiledOut = processDecompiledObjects(decompiledFilePath, objectOids, objectDetailOids);
+  auto decompiledOut = processDecompiledObjects(aera->getDecompiledFileName(), objectOids, objectDetailOids);
 
   r_comp::Image image = aera->getObjectsImage();
   // TO DO: Get models from ModelBase
 
   // Get OIDs and detail OIDs
+  /*
   for (uint16 i = 0; i < image.code_segment_.objects_.size(); ++i) {
+    
     auto object = image.code_segment_.objects_[i];
     string name = "beans" + std::to_string(i);
     objectOids[name] = object->oid_;
     objectDetailOids[name] = object->detail_oid_;
-  }
+
+    QMessageBox::information(NULL, "Object info",
+      "Name: " + QString::fromStdString(name) + "\n" +
+      "OID: " + QString::fromStdString(std::to_string(object->oid_)) + "\n" +
+      "Detail OID: " + QString::fromStdString(std::to_string(object->detail_oid_)) + "\n"
+    );
+  }*/
   
   progress.setLabelText(getProgressLabelText("Compiling code"));
   QApplication::processEvents();

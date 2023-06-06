@@ -60,7 +60,7 @@
 #include <regex>
 #include <QString>
 #include "submodules/AERA/r_exec/mem.h"
-#include "submodules/AERA/AERA/AERA_main.h"
+#include "submodules/AERA/AERA/main.h"
 
 class QProgressDialog;
 

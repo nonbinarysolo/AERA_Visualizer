@@ -251,17 +251,15 @@
     <ClCompile Include="aera-visualizer-window.cpp" />
     <ClCompile Include="replicode-objects.cpp" />
     <ClCompile Include="submodules\AERA\AERA\AERA_main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.cc" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.cpp" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.cpp" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.cpp" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.cpp" />
-    <ClCompile Include="submodules\AERA\AERA\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\main.cpp" />
     <ClCompile Include="submodules\AERA\AERA\test_mem.cpp" />
     <ClCompile Include="submodules\AERA\r_code\atom.cpp" />
     <ClCompile Include="submodules\AERA\r_code\atom.inline.cpp">
@@ -366,6 +364,7 @@
     <QtRcc Include="aera_visualizer.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="submodules\AERA\AERA\main.h" />
     <ClInclude Include="submodules\AERA\usr_operators\Callbacks\callbacks.h" />
     <ClInclude Include="submodules\AERA\usr_operators\Operators\operators.h" />
     <ClInclude Include="submodules\AERA\usr_operators\TestProgram\test_program.h" />
@@ -410,7 +409,6 @@
     <ClInclude Include="graphics-items\promoted-prediction-item.hpp" />
     <ClInclude Include="graphics-items\simulation-commit-item.hpp" />
     <ClInclude Include="replicode-objects.hpp" />
-    <ClInclude Include="submodules\AERA\AERA\AERA_main.h" />
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.h" />
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\utils.h" />
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.h" />
