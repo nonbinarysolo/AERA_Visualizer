@@ -254,7 +254,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.cc" />
+    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_data_message.pb.cc" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.cpp" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.cpp" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.cpp" />
@@ -364,6 +364,8 @@
     <QtRcc Include="aera_visualizer.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_data_message.pb.h" />
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\utils.h" />
     <ClInclude Include="submodules\AERA\AERA\main.h" />
     <ClInclude Include="submodules\AERA\usr_operators\Callbacks\callbacks.h" />
     <ClInclude Include="submodules\AERA\usr_operators\Operators\operators.h" />
@@ -409,8 +411,6 @@
     <ClInclude Include="graphics-items\promoted-prediction-item.hpp" />
     <ClInclude Include="graphics-items\simulation-commit-item.hpp" />
     <ClInclude Include="replicode-objects.hpp" />
-    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.h" />
-    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\utils.h" />
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.h" />
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.h" />
     <ClInclude Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.h" />
@@ -526,8 +526,7 @@
     <Image Include="images\zoom-to.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="submodules\AERA\AERA\IODevices\TCP\Proto\ReadMe.md" />
-    <None Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.proto" />
+    <None Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_data_message.proto" />
     <None Include="submodules\AERA\r_exec\r_exec.vcxproj" />
   </ItemGroup>
   <ItemGroup>
