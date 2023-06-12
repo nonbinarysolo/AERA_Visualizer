@@ -284,12 +284,12 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
 string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QProgressDialog& progress)
 {
   basePeriod_ = basePeriod;
-  
-  // Retreve metadata from the AERA instance
-  r_comp::Metadata metadata = aera->getMetadata();
 
   // Dump everything to files so we can process them
   aera->brainDump();
+  
+  // Retreve metadata from the AERA instance
+  r_comp::Metadata metadata = aera->getMetadata();  
 
   progress.setLabelText(getProgressLabelText("Preprocessing code (1 of 2)"));
   QApplication::processEvents();
@@ -305,7 +305,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   // Not sure where to get these
   auto decompiledOut = processDecompiledObjects(aera->getDecompiledFileName(), objectOids, objectDetailOids);
 
-  r_comp::Image image = aera->getObjectsImage();
+  r_comp::Image* image = aera->getObjectsImage();
   // TO DO: Get models from ModelBase
 
   // Get OIDs and detail OIDs
@@ -333,7 +333,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   resized_vector<Code*> imageObjects;
   // tempMem is only used internally for calling build_object.
   MemExec<LObject, MemStatic> tempMem;
-  image.get_objects(&tempMem, imageObjects);
+  image->get_objects(&tempMem, imageObjects);
 
   progress.setLabelText(getProgressLabelText("Postprocessing code"));
   // We update progress for 3 loops of imageObjects.size().
@@ -406,7 +406,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   // We have to get the source code by decompiling the packet objects in objects_ (not from
   // the original decompiled code in decompiledFilePath) because variable names can be different.
   r_comp::Image packedImage;
-  packedImage.object_names_.symbols_ = image.object_names_.symbols_;
+  packedImage.object_names_.symbols_ = image->object_names_.symbols_;
   packedImage.add_objects(objects_, true);
 
   Decompiler decompiler;
