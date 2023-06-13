@@ -392,17 +392,8 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   Decompiler decompiler;
   decompiler.init(&metadata);
 
-  // Fill the objectNames map from the image and use it in decompile_references.
+  // Decompile references with dummy list
   unordered_map<uint16, std::string> objectNames;
-  for (auto i = 0; i < packedImage.code_segment_.objects_.size(); ++i) {
-    if (progress.wasCanceled())
-      return "cancel";
-    progress.setValue(imageObjects.size() + i);
-    if (i % 100 == 0)
-      QApplication::processEvents();
-
-    objectNames[i] = Compiler.getObjectName(i);
-  }
   decompiler.decompile_references(&packedImage, &objectNames);
 
   for (uint16 i = 0; i < packedImage.code_segment_.objects_.size(); ++i) {
