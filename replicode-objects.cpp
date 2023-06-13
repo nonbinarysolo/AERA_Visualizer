@@ -81,17 +81,18 @@ namespace aera_visualizer {
 ReplicodeObjects::ReplicodeObjects()
 : intMemberRegex_("( ?\\d+)")
 {
+}
+
+string ReplicodeObjects::init(const string& userClassesFilePath, const string& decompiledFilePath,
+    microseconds basePeriod, QProgressDialog& progress)
+{
   // Set up progressLines_. Used by getProgressLabelText to make the progress messages clearer.
   progressMessages_.push_back("Preprocessing code (1 of 2)");
   progressMessages_.push_back("Preprocessing code (2 of 2)");
   progressMessages_.push_back("Compiling code");
   progressMessages_.push_back("Postprocessing code");
   progressMessages_.push_back("Reading runtime output");
-}
 
-string ReplicodeObjects::init(const string& userClassesFilePath, const string& decompiledFilePath,
-    microseconds basePeriod, QProgressDialog& progress)
-{
   basePeriod_ = basePeriod;
 
   // Run the proprocessor on the user operators (which includes std.replicode) just to
@@ -284,48 +285,27 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
 
 string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QProgressDialog& progress)
 {
+  // Set up progressLines_. Used by getProgressLabelText to make the progress messages clearer.
+  progressMessages_.push_back("Snapshotting AERA state");
+  progressMessages_.push_back("Retrieving objects");
+  progressMessages_.push_back("Postprocessing code");
+
   basePeriod_ = basePeriod;
 
-  // Dump everything to files so we can process them
-  aera->brainDump();
-  
-  // Retreve metadata from the AERA instance
-  r_comp::Metadata metadata = aera->getMetadata();
-
-  progress.setLabelText(getProgressLabelText("Preprocessing code (1 of 2)"));
+  progress.setLabelText(getProgressLabelText("Snapshotting AERA state"));
   QApplication::processEvents();
   if (progress.wasCanceled())
     return "cancel";
+
+  // Get current state of AERA
+  aera->brainDump();                                // Get AERA to dump everything to a file
+  r_comp::Image* image = aera->getObjectsImage();   // Get objects from AERA's memory
+  r_comp::Metadata metadata = aera->getMetadata();  // Retreve metadata to interpret objects image
   
   // Now() is called when constructing model controllers.
   r_exec::Now = Time::Get;
-
-  map<string, uint32> objectOids;
-  map<string, uint64> objectDetailOids;
-
-  // Not sure where to get these
-  //auto decompiledOut = processDecompiledObjects(aera->getDecompiledFileName(), objectOids, objectDetailOids);
-
-  r_comp::Image* image = aera->getObjectsImage();
-  // TO DO: Get models from ModelBase
-
-  // Get OIDs and detail OIDs
-  /*
-  for (uint16 i = 0; i < image.code_segment_.objects_.size(); ++i) {
-    
-    auto object = image.code_segment_.objects_[i];
-    string name = "beans" + std::to_string(i);
-    objectOids[name] = object->oid_;
-    objectDetailOids[name] = object->detail_oid_;
-
-    QMessageBox::information(NULL, "Object info",
-      "Name: " + QString::fromStdString(name) + "\n" +
-      "OID: " + QString::fromStdString(std::to_string(object->oid_)) + "\n" +
-      "Detail OID: " + QString::fromStdString(std::to_string(object->detail_oid_)) + "\n"
-    );
-  }*/
   
-  progress.setLabelText(getProgressLabelText("Compiling code"));
+  progress.setLabelText(getProgressLabelText("Retrieving objects"));
   QApplication::processEvents();
   if (progress.wasCanceled())
     return "cancel";
@@ -339,8 +319,9 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   progress.setLabelText(getProgressLabelText("Postprocessing code"));
   // We update progress for 3 loops of imageObjects.size().
   progress.setMaximum(imageObjects.size() * 3);
-  // Set the OIDs and detail OIDs of objects in imageObjects based on the decompiled output.
-  // Set up objectLabel_ and labelObject_ based on the object in imageObjects.
+  
+
+  // Set up object labels based on class + OID
   for (auto i = 0; i < imageObjects.size(); ++i) {
     if (progress.wasCanceled())
       return "cancel";
@@ -350,36 +331,16 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
 
     Code* object = imageObjects[i];
 
-    // Assign label based on class. All internal references use OIDs, detail OIDs, or reference so
-    // the labels can be assigned more or less arbitrarily ("The labels can be whatever I want").
-    // To see the convention used for runtime_out.txt, just search for the macro `OUTPUT_LINE`
-    string label = "beans_";
-    label.append(std::to_string(i));
-    //switch (object->code(0).asOpcode()) {
-
-    //for (int i = 0; i < metadata.classes_by_opcodes_.size(); i++) {
-    //  if (object->code(0).asOpcode() == metadata.classes_by_opcodes_[i]) {
-    //    // stuff
-    //  }
-    //}
-
+    // Assign label based on class. All internal references use OIDs, detail OIDs,
+    // or reference so the labels can be assigned more or less arbitrarily. To see
+    // the convention used for runtime_out.txt, just search for the macro `OUTPUT_LINE`
+    string OID = std::to_string(object->get_oid());
+    string prefix = metadata.classes_by_opcodes_[object->code(0).asOpcode()].str_opcode;
+    string label = prefix + "_" + OID;
 
     // Save to objectLabel and labelObject
-    // Profit
-
-    //string label = Compiler.getObjectName(i);
-    if (label != "") {
-      objectLabel_[imageObjects[i]] = label;
-      labelObject_[label] = imageObjects[i];
-
-      auto oidEntry = objectOids.find(label);
-      if (oidEntry != objectOids.end())
-        imageObjects[i]->set_oid(oidEntry->second);
-
-      auto detailOidEntry = objectDetailOids.find(label);
-      if (detailOidEntry != objectDetailOids.end())
-        imageObjects[i]->set_detail_oid(detailOidEntry->second);
-    }
+    objectLabel_[imageObjects[i]] = label;
+    labelObject_[label] = imageObjects[i];
   }
 
   // Transfer imageObjects to objects_, unpacking and processing as needed.
@@ -423,8 +384,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     }
   }
 
-  // We have to get the source code by decompiling the packet objects in objects_ (not from
-  // the original decompiled code in decompiledFilePath) because variable names can be different.
+  // Get the source code by decompiling the packet objects in objects_
   r_comp::Image packedImage;
   packedImage.object_names_.symbols_ = image->object_names_.symbols_;
   packedImage.add_objects(objects_, true);
