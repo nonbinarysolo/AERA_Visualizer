@@ -59,6 +59,7 @@
 #include "submodules/AERA/r_comp/compiler.h"
 #include "submodules/AERA/r_comp/decompiler.h"
 #include "submodules/AERA/r_exec/model_base.h"
+#include "submodules/AERA/r_exec/opcodes.h"
 #include "submodules/AERA/AERA/main.h"
 #include "replicode-objects.hpp"
 #include <QApplication>
@@ -289,7 +290,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   aera->brainDump();
   
   // Retreve metadata from the AERA instance
-  r_comp::Metadata metadata = aera->getMetadata();  
+  r_comp::Metadata metadata = aera->getMetadata();
 
   progress.setLabelText(getProgressLabelText("Preprocessing code (1 of 2)"));
   QApplication::processEvents();
@@ -303,7 +304,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   map<string, uint64> objectDetailOids;
 
   // Not sure where to get these
-  auto decompiledOut = processDecompiledObjects(aera->getDecompiledFileName(), objectOids, objectDetailOids);
+  //auto decompiledOut = processDecompiledObjects(aera->getDecompiledFileName(), objectOids, objectDetailOids);
 
   r_comp::Image* image = aera->getObjectsImage();
   // TO DO: Get models from ModelBase
@@ -347,7 +348,26 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     if (i % 100 == 0)
       QApplication::processEvents();
 
-    string label = Compiler.getObjectName(i);
+    Code* object = imageObjects[i];
+
+    // Assign label based on class. All internal references use OIDs, detail OIDs, or reference so
+    // the labels can be assigned more or less arbitrarily ("The labels can be whatever I want").
+    // To see the convention used for runtime_out.txt, just search for the macro `OUTPUT_LINE`
+    string label = "beans_";
+    label.append(std::to_string(i));
+    //switch (object->code(0).asOpcode()) {
+
+    //for (int i = 0; i < metadata.classes_by_opcodes_.size(); i++) {
+    //  if (object->code(0).asOpcode() == metadata.classes_by_opcodes_[i]) {
+    //    // stuff
+    //  }
+    //}
+
+
+    // Save to objectLabel and labelObject
+    // Profit
+
+    //string label = Compiler.getObjectName(i);
     if (label != "") {
       objectLabel_[imageObjects[i]] = label;
       labelObject_[label] = imageObjects[i];

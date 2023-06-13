@@ -222,8 +222,6 @@ AeraVisualizerWindow::AeraVisualizerWindow()
 
   setWindowTitle(tr("AERA Visualizer"));
   setUnifiedTitleAndToolBarOnMac(true);
-
-  loadNewSeed(); // TO DO: Remove this after done debugging
 }
 
 bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgressDialog& progress)
@@ -324,8 +322,6 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
   }
   progress.setMaximum(nLines);
 
-  QMessageBox::information(NULL, "Debug", "File has " + QString::fromStdString(std::to_string(nLines)) + " lines");
-
   // pendingEvents is an ordered map keyed by event time. The value is a list of pending events at the time.
   map<core::Timestamp, vector<shared_ptr<AeraEvent> > > pendingEvents;
 
@@ -355,9 +351,6 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
         model->code(MDL_SR) = Atom::Float(successRate);
         startupEvents_.push_back(make_shared <NewModelEvent>(
           replicodeObjects_.getTimeReference(), model, strength, evidenceCount, successRate, stoll(matches[2].str())));
-      }
-      else {
-        QMessageBox::information(NULL, "Debug", "Model not found: " + QString::fromStdString(matches[1]));
       }
 
       continue;
@@ -392,8 +385,6 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
       if (model)
         events_.push_back(make_shared<NewModelEvent>(
           timestamp, model, strength, evidenceCount, successRate, stoll(matches[2].str())));
-      else
-        QMessageBox::information(NULL, "Debug", "New model not found: " + QString::fromStdString(matches[1]));
     }
     else if (regex_search(lineAfterTimestamp, matches, setEvidenceCountAndSuccessRateRegex)) {
       auto model = replicodeObjects_.getObject(stoul(matches[1].str()));
@@ -423,8 +414,6 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
       if (compositeState)
         events_.push_back(make_shared<NewCompositeStateEvent>(
           timestamp, compositeState, stoll(matches[2].str())));
-      else
-        QMessageBox::information(NULL, "Debug", "New CST not found: " + QString::fromStdString(matches[1]));
     }
     else if (regex_search(lineAfterTimestamp, matches, autofocusNewObjectRegex)) {
       auto fromObject = replicodeObjects_.getObject(stoul(matches[1].str()));
@@ -788,8 +777,6 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
       events_.push_back(event->second[i]);
   }
   pendingEvents.clear();
-
-  QMessageBox::information(NULL, "Debug", "Loaded " + QString::fromStdString(std::to_string(events_.size())) + " events");
 
   return true;
 }
@@ -1975,12 +1962,7 @@ void AeraVisualizerWindow::loadNewSeed()
   progress.show();
   QApplication::processEvents();
 
-  ReplicodeObjects replicodeObjects_;
-  /*
-  string error = replicodeObjects.init(
-    settingsFileDir.absoluteFilePath(settings.usr_class_path_.c_str()).toStdString(),
-    settingsFileDir.absoluteFilePath(settings.decompilation_file_path_.c_str()).toStdString(),
-    microseconds(settings.base_period_), progress);*/
+  // Process in Replicode objects from the AERA instance
   string error = replicodeObjects_.init(&AERA, microseconds(settings.base_period_), progress);
   if (error == "cancel")
     return;
@@ -1989,6 +1971,7 @@ void AeraVisualizerWindow::loadNewSeed()
     return;
   }
 
+  // Process runtime_out.txt for events (these form the basis for graphics objects)
   if (!addEvents(runtimeOutputFilePath, progress))
     return;
 
