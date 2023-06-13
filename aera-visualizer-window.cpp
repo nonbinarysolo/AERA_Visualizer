@@ -222,6 +222,9 @@ AeraVisualizerWindow::AeraVisualizerWindow()
 
   setWindowTitle(tr("AERA Visualizer"));
   setUnifiedTitleAndToolBarOnMac(true);
+
+  // Turn everything off until something's loaded in
+  setUIEnabled(false);
 }
 
 bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgressDialog& progress)
@@ -1999,6 +2002,9 @@ void AeraVisualizerWindow::loadNewSeed()
   // This version isn't resettable just yet
   newInstanceAction_->setEnabled(false);
   loadOutputAction_->setEnabled(false);
+
+  // Enable the UI now that there's something to analyze
+  setUIEnabled(true);
 }
 
 void AeraVisualizerWindow::openOutput()
@@ -2235,6 +2241,31 @@ void AeraVisualizerWindow::createToolbars()
   connect(requirementsCheckBox_, &QCheckBox::stateChanged, [=](int state) {
     mainScene_->setItemsVisible(ModelImdlPredictionEvent::EVENT_TYPE, state == Qt::Checked);  });
   toolbar->addWidget(requirementsCheckBox_);
+}
+
+void AeraVisualizerWindow::setUIEnabled(bool enabled) {
+  // Actions
+  saveOutputAction_->setEnabled(enabled);
+  resetAERAInstanceAction_->setEnabled(enabled);
+  configureAERAInstanceAction_->setEnabled(enabled);
+  zoomInAction_->setEnabled(enabled);
+  zoomOutAction_->setEnabled(enabled);
+  zoomHomeAction_->setEnabled(enabled);
+  findAction_->setEnabled(enabled);
+  findNextAction_->setEnabled(enabled);
+  findPrevAction_->setEnabled(enabled);
+  fitAllAction_->setEnabled(enabled);
+
+  // Checkboxes
+  simulationsCheckBox_->setEnabled(enabled);
+  allSimulationInputsCheckBox_->setEnabled(enabled);
+  singleStepSimulationCheckBox_->setEnabled(enabled);
+  nonSimulationsCheckBox_->setEnabled(enabled);
+  essenceFactsCheckBox_->setEnabled(enabled);
+  instantiatedCompositeStatesCheckBox_->setEnabled(enabled);
+  instantiatedModelsCheckBox_->setEnabled(enabled);
+  predictedInstantiatedCompositeStatesCheckBox_->setEnabled(enabled);
+  requirementsCheckBox_->setEnabled(enabled);
 }
 
 }

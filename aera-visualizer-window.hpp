@@ -290,6 +290,9 @@ private:
    */
   void abaNewStep(int step);
 
+  // Use these to turn the UI on and off depending on whether anything is currently loaded
+  void setUIEnabled(bool enabled);
+
   void playPauseButtonClickedImpl();
   void stepButtonClickedImpl();
   void stepBackButtonClickedImpl();
