@@ -1921,22 +1921,34 @@ void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
 
 void AeraVisualizerWindow::loadNewSeed()
 {
-  // Read the settings file in the visualizer project directory
-  QString settingsFilePath = "./settings.xml";
+  // Try and retrieve the last settings file loaded (fall back to the local one)
+  QSettings preferences;
+  QString settingsFilePath0 = preferences.value("settingsFilePath").toString();
+  if (settingsFilePath0 == "")
+    settingsFilePath0 = "./settings.xml";
 
+  // Present a file dialog to the user so they can choose a settings file
+  QString settingsFilePath = QFileDialog::getOpenFileName(NULL,
+    "Open AERA settings XML file", settingsFilePath0, "XML Files (*.xml);;All Files (*.*)");
+  if (settingsFilePath == "")
+    return;
+  else
+    preferences.setValue("settingsFilePath", settingsFilePath);
+
+  // Load the settings
   Settings settings;
   if (!settings.load(settingsFilePath.toStdString().c_str())) {
     QMessageBox::information(NULL, "XML Error", "Cannot load XML file " + settingsFilePath, QMessageBox::Ok);
     return;
   }
 
+  // Put the filename in the title
   setWindowTitle(QString("AERA Visualizer - ") + QFileInfo(settings.source_file_name_.c_str()).fileName());
 
   // Run AERA real quick
   AERA_interface AERA(settingsFilePath.toStdString().c_str(), "");
   AERA.run();
   
-
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();
   string runtimeOutputFilePath = settingsFileDir.absoluteFilePath(settings.runtime_output_file_path_.c_str()).toStdString();
@@ -1983,6 +1995,10 @@ void AeraVisualizerWindow::loadNewSeed()
   mainScene_->setReplicodeObjects(&replicodeObjects_);
 
   progress.close();
+
+  // This version isn't resettable just yet
+  newInstanceAction_->setEnabled(false);
+  loadOutputAction_->setEnabled(false);
 }
 
 void AeraVisualizerWindow::openOutput()
