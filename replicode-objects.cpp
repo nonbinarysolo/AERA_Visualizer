@@ -384,6 +384,9 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     }
   }
 
+  // Make sure to set this
+  timeReference_ = aera->getStartTime();
+
   // Get the source code by decompiling the packet objects in objects_
   r_comp::Image packedImage;
   packedImage.object_names_.symbols_ = image->object_names_.symbols_;
