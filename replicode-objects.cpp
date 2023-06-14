@@ -323,7 +323,10 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   progress.setMaximum(imageObjects.size() * 3);
   
 
-  // Set up object labels based on class + OID
+  // Assign label based on class. All internal references use OIDs, detail OIDs,
+  // or reference so the labels can be assigned more or less arbitrarily. To see
+  // the convention used for runtime_out.txt, just search for the macro `OUTPUT_LINE`
+  int anonOID = 0; // Some objects don't have an OID so just assign them a sequential one
   for (auto i = 0; i < imageObjects.size(); ++i) {
     if (progress.wasCanceled())
       return "cancel";
@@ -331,15 +334,22 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     if (i % 100 == 0)
       QApplication::processEvents();
 
+    // Get an object
     Code* object = imageObjects[i];
 
-    // Assign label based on class. All internal references use OIDs, detail OIDs,
-    // or reference so the labels can be assigned more or less arbitrarily. To see
-    // the convention used for runtime_out.txt, just search for the macro `OUTPUT_LINE`
-    string OID = std::to_string(object->get_oid());
+    // Set prefix based on class
     string prefix = metadata.classes_by_opcodes_[object->code(0).asOpcode()].str_opcode;
-    string label = prefix + "_" + OID;
 
+    // Get the OID or sub one in if needed
+    int oid = object->get_oid();
+    string label;
+    if (oid == -1) {
+      label = prefix + std::to_string(anonOID);
+      imageObjects[i]->set_oid(anonOID);
+      anonOID++;
+    } else 
+      label = prefix + "_" + std::to_string(oid);
+   
     // Save to objectLabel and labelObject
     objectLabel_[imageObjects[i]] = label;
     labelObject_[label] = imageObjects[i];
@@ -398,7 +408,19 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   decompiler.init(&metadata);
 
   // Decompile references with dummy list
+  int i = 0;
   unordered_map<uint16, std::string> objectNames;
+  
+  for (auto o = objects_.begin(); o != objects_.end(); ++o) {
+    if (progress.wasCanceled())
+      return "cancel";
+    progress.setValue(imageObjects.size() + i);
+    if (i % 100 == 0)
+      QApplication::processEvents();
+
+    objectNames[i] = objectLabel_[*o];
+    i++;
+  }
   decompiler.decompile_references(&packedImage, &objectNames);
 
   for (uint16 i = 0; i < packedImage.code_segment_.objects_.size(); ++i) {
