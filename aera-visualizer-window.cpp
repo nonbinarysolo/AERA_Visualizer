@@ -183,11 +183,6 @@ AeraVisualizerWindow::AeraVisualizerWindow()
 {
   createActions();
   createMenus();
-
-  // Set mainScene_ to null so that setPlayTime will not try to auto-scroll it.
-  mainScene_ = 0;
-  setPlayTime(replicodeObjects_.getTimeReference());
-
   createToolbars();
 
   modelsScene_ = new AeraVisualizerScene(this, false,
@@ -1989,6 +1984,10 @@ void AeraVisualizerWindow::loadNewSeed()
   // Process runtime_out.txt for events (these form the basis for graphics objects)
   if (!addEvents(runtimeOutputFilePath, progress))
     return;
+  
+  // Show the last progress message
+  progress.setLabelText(replicodeObjects_.getProgressLabelText("Setting up workspace"));
+  QApplication::processEvents();
 
   // Pass on the changes
   essencePropertyObject_ = replicodeObjects_.getObject("essence");
@@ -1997,7 +1996,9 @@ void AeraVisualizerWindow::loadNewSeed()
   modelsScene_->setReplicodeObjects(&replicodeObjects_);
   mainScene_->setReplicodeObjects(&replicodeObjects_);
 
-  progress.close();
+  // Set the play time to the start
+  setPlayTime(replicodeObjects_.getTimeReference());
+  setSliderToPlayTime();
 
   // This version isn't resettable just yet
   newInstanceAction_->setEnabled(false);
@@ -2005,6 +2006,8 @@ void AeraVisualizerWindow::loadNewSeed()
 
   // Enable the UI now that there's something to analyze
   setUIEnabled(true);
+
+  progress.close();
 }
 
 void AeraVisualizerWindow::openOutput()

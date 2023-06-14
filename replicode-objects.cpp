@@ -289,6 +289,8 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   progressMessages_.push_back("Snapshotting AERA state");
   progressMessages_.push_back("Retrieving objects");
   progressMessages_.push_back("Postprocessing code");
+  progressMessages_.push_back("Reading runtime output");
+  progressMessages_.push_back("Setting up workspace");
 
   basePeriod_ = basePeriod;
 
