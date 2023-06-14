@@ -323,10 +323,17 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   progress.setMaximum(imageObjects.size() * 3);
   
 
-  // Assign label based on class. All internal references use OIDs, detail OIDs,
-  // or reference so the labels can be assigned more or less arbitrarily. To see
-  // the convention used for runtime_out.txt, just search for the macro `OUTPUT_LINE`
-  int anonOID = 0; // Some objects don't have an OID so just assign them a sequential one
+  // Assign object labels. All internal references use OIDs, detail OIDs, or reference
+  // so the labels can be assigned more or less arbitrarily. If available, we'll use
+  // the name used in the seed program. If not,  this code follows the convention for
+  // runtime_out.txt (search for the macro `OUTPUT_LINE`).
+  
+  // Use these names where available
+  std::unordered_map<uint32, std::string> seedNames = aera->getSeedNames().symbols_;
+
+  // Some objects don't have an OID so just assign them a sequential one
+  int anonOID = 0;
+
   for (auto i = 0; i < imageObjects.size(); ++i) {
     if (progress.wasCanceled())
       return "cancel";
@@ -334,21 +341,28 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     if (i % 100 == 0)
       QApplication::processEvents();
 
-    // Get an object
     Code* object = imageObjects[i];
-
-    // Set prefix based on class
-    string prefix = metadata.classes_by_opcodes_[object->code(0).asOpcode()].str_opcode;
-
-    // Get the OID or sub one in if needed
     int oid = object->get_oid();
     string label;
-    if (oid == -1) {
-      label = prefix + std::to_string(anonOID);
-      imageObjects[i]->set_oid(anonOID);
-      anonOID++;
-    } else 
-      label = prefix + "_" + std::to_string(oid);
+
+    // If a name already exists, use it
+    if (seedNames.find(oid) != seedNames.end())
+      label = seedNames[oid];
+
+    // If not, assign it as CLASS_OID or similar
+    else {
+      // Retrieve prefix from opcode
+      string prefix = metadata.classes_by_opcodes_[object->code(0).asOpcode()].str_opcode;
+
+      // Some objects don't have OIDs so assign one
+      if (oid == -1) {
+        label = prefix + std::to_string(anonOID);
+        imageObjects[i]->set_oid(anonOID);
+        anonOID++;
+      }
+      else
+        label = prefix + "_" + std::to_string(oid);
+    }
    
     // Save to objectLabel and labelObject
     objectLabel_[imageObjects[i]] = label;
@@ -407,10 +421,9 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   Decompiler decompiler;
   decompiler.init(&metadata);
 
-  // Decompile references with dummy list
+  // Copy labels into objectNames for the decopiler
   int i = 0;
   unordered_map<uint16, std::string> objectNames;
-  
   for (auto o = objects_.begin(); o != objects_.end(); ++o) {
     if (progress.wasCanceled())
       return "cancel";
