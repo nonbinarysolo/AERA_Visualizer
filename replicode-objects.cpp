@@ -81,11 +81,18 @@ namespace aera_visualizer {
 ReplicodeObjects::ReplicodeObjects()
 : intMemberRegex_("( ?\\d+)")
 {
+  // Set up progressLines_. Used by getProgressLabelText to make the progress messages clearer.
+  progressMessages_.push_back("Snapshotting AERA state");
+  progressMessages_.push_back("Retrieving objects");
+  progressMessages_.push_back("Postprocessing code");
+  progressMessages_.push_back("Reading runtime output");
+  progressMessages_.push_back("Setting up workspace");
 }
 
 string ReplicodeObjects::init(const string& userClassesFilePath, const string& decompiledFilePath,
     microseconds basePeriod, QProgressDialog& progress)
 {
+  // TO DO: These will need to be reconciled with the slightly different ones of the other init
   // Set up progressLines_. Used by getProgressLabelText to make the progress messages clearer.
   progressMessages_.push_back("Preprocessing code (1 of 2)");
   progressMessages_.push_back("Preprocessing code (2 of 2)");
@@ -285,13 +292,7 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
 
 string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QProgressDialog& progress)
 {
-  // Set up progressLines_. Used by getProgressLabelText to make the progress messages clearer.
-  progressMessages_.push_back("Snapshotting AERA state");
-  progressMessages_.push_back("Retrieving objects");
-  progressMessages_.push_back("Postprocessing code");
-  progressMessages_.push_back("Reading runtime output");
-  progressMessages_.push_back("Setting up workspace");
-
+  // Store this
   basePeriod_ = basePeriod;
 
   progress.setLabelText(getProgressLabelText("Snapshotting AERA state"));
@@ -300,28 +301,21 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     return "cancel";
 
   // Get current state of AERA
-  aera->brainDump();                                // Get AERA to dump everything to a file
   r_comp::Image* image = aera->getObjectsImage();   // Get objects from AERA's memory
   r_comp::Metadata metadata = aera->getMetadata();  // Retreve metadata to interpret objects image
-  
-  // Now() is called when constructing model controllers.
-  r_exec::Now = Time::Get;
   
   progress.setLabelText(getProgressLabelText("Retrieving objects"));
   QApplication::processEvents();
   if (progress.wasCanceled())
     return "cancel";
-
+  
   // Transfer objects from the compiler image to imageObjects.
   resized_vector<Code*> imageObjects;
-  // tempMem is only used internally for calling build_object.
-  MemExec<LObject, MemStatic> tempMem;
-  image->get_objects(&tempMem, imageObjects);
-
-  progress.setLabelText(getProgressLabelText("Postprocessing code"));
-  // We update progress for 3 loops of imageObjects.size().
-  progress.setMaximum(imageObjects.size() * 3);
+  image->get_objects(_Mem::Get(), imageObjects);
   
+  // We update progress for 3 loops of imageObjects.size().
+  progress.setLabelText(getProgressLabelText("Postprocessing code"));
+  progress.setMaximum(imageObjects.size() * 3);
 
   // Assign object labels. All internal references use OIDs, detail OIDs, or reference
   // so the labels can be assigned more or less arbitrarily. If available, we'll use

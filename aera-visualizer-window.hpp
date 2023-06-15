@@ -252,6 +252,12 @@ private:
   void createToolbars();
 
   /**
+  * Snapshots another images of AERA's state and reads in new lines from
+  * runtime_out.txt. This should be done after advancing AERA forwards.
+  */
+  void updateObjectsAndEvents();
+
+  /**
    * Get the time stamp from the decimal strings of seconds, milliseconds and
    * microseconds at matches[index], matches[index + 1] and matches[index + 2], then add
    * replicodeObjects_.getTimeReference().
@@ -352,6 +358,7 @@ private:
   r_code::Code* essencePropertyObject_;
   QColor phasedOutModelColor_;
 
+  int lastLine_ = 0;      // The farthest we've read into runtime_out.txt
   bool showRelativeTime_;
   core::Timestamp playTime_;
   int playTimerId_;

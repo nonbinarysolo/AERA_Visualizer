@@ -336,6 +336,12 @@ bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgr
     if (lineNumber % 100 == 0)
       QApplication::processEvents();
 
+    // Fast foward past the last line read
+    if (lineNumber <= lastLine_)
+      continue;
+    else
+      lastLine_ = lineNumber;
+
     smatch matches;
 
     if (regex_search(line, matches, loadModelRegex)) {
@@ -1771,6 +1777,15 @@ void AeraVisualizerWindow::playPauseButtonClickedImpl()
 
 void AeraVisualizerWindow::stepButtonClickedImpl()
 {
+  // Run AERA a bit more (TO DO: Only if we're not at max event time)
+  aera_->runFor(milliseconds(101)); // TO DO: This step length should be configurable
+
+  // Update everything
+  updateObjectsAndEvents();
+  
+  setPlayTime(replicodeObjects_.getTimeReference());
+  setSliderToPlayTime();
+
   stopPlay();
   size_t iNextStepEvent;
   if (getINextStepEvent(Utils_MaxTime, iNextEvent_, iNextStepEvent) == Utils_MaxTime)
@@ -1946,7 +1961,6 @@ void AeraVisualizerWindow::loadNewSeed()
 
   // Reset AERA
   aera_ = new AERA_interface(settingsFilePath.toStdString().c_str(), "");
-  aera_->run(); // TO DO: Remove this
   
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();
@@ -1961,6 +1975,16 @@ void AeraVisualizerWindow::loadNewSeed()
     }
   }
 
+  // This version isn't resettable just yet
+  newInstanceAction_->setEnabled(false);
+  loadOutputAction_->setEnabled(false);
+
+  // Enable the UI now that there's something to analyze
+  setUIEnabled(true);
+}
+
+void AeraVisualizerWindow::updateObjectsAndEvents()
+{
   // Create the progress dialog to show while compiling and reading the runtime output.
   QProgressDialog progress("", "Cancel", 0, 100);
   progress.setWindowModality(Qt::WindowModal);
@@ -1972,8 +1996,9 @@ void AeraVisualizerWindow::loadNewSeed()
   progress.setAutoClose(false);
   progress.show();
   QApplication::processEvents();
-
+  
   // Process in Replicode objects from the AERA instance
+  Settings settings = *aera_->getSettings();
   string error = replicodeObjects_.init(aera_, microseconds(settings.base_period_), progress);
   if (error == "cancel")
     return;
@@ -1981,11 +2006,11 @@ void AeraVisualizerWindow::loadNewSeed()
     QMessageBox::information(NULL, "Compiler Error", error.c_str(), QMessageBox::Ok);
     return;
   }
-
-  // Process runtime_out.txt for events (these form the basis for graphics objects)
-  if (!addEvents(runtimeOutputFilePath, progress))
-    return;
   
+  // Process runtime_out.txt for events (these form the basis for graphics objects)
+  if (!addEvents(settings.runtime_output_file_path_, progress))
+    return;
+
   // Show the last progress message
   progress.setLabelText(replicodeObjects_.getProgressLabelText("Setting up workspace"));
   QApplication::processEvents();
@@ -1997,17 +2022,7 @@ void AeraVisualizerWindow::loadNewSeed()
   modelsScene_->setReplicodeObjects(&replicodeObjects_);
   mainScene_->setReplicodeObjects(&replicodeObjects_);
 
-  // Set the play time to the start
-  setPlayTime(replicodeObjects_.getTimeReference());
-  setSliderToPlayTime();
-
-  // This version isn't resettable just yet
-  newInstanceAction_->setEnabled(false);
-  loadOutputAction_->setEnabled(false);
-
-  // Enable the UI now that there's something to analyze
-  setUIEnabled(true);
-
+  // Clean up
   progress.close();
 }
 
