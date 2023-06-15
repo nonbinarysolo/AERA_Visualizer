@@ -1944,9 +1944,9 @@ void AeraVisualizerWindow::loadNewSeed()
   // Put the filename in the title
   setWindowTitle(QString("AERA Visualizer - ") + QFileInfo(settings.source_file_name_.c_str()).fileName());
 
-  // Run AERA real quick
-  AERA_interface AERA(settingsFilePath.toStdString().c_str(), "");
-  AERA.run();
+  // Reset AERA
+  aera_ = new AERA_interface(settingsFilePath.toStdString().c_str(), "");
+  aera_->run(); // TO DO: Remove this
   
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();
@@ -1974,7 +1974,7 @@ void AeraVisualizerWindow::loadNewSeed()
   QApplication::processEvents();
 
   // Process in Replicode objects from the AERA instance
-  string error = replicodeObjects_.init(&AERA, microseconds(settings.base_period_), progress);
+  string error = replicodeObjects_.init(aera_, microseconds(settings.base_period_), progress);
   if (error == "cancel")
     return;
   if (error != "") {
@@ -2018,7 +2018,12 @@ void AeraVisualizerWindow::openOutput()
 
 void AeraVisualizerWindow::saveOutput()
 {
-  //
+  // Save everything and display a confirmation
+  aera_->brainDump();
+  QString decompiled_objects = QString::fromStdString(aera_->getSettings()->decompilation_file_path_);
+  QString runtime_out = QString::fromStdString(aera_->getSettings()->runtime_output_file_path_);
+  QMessageBox::information(this, "Success!",
+    "Outut saved to \"" + decompiled_objects + "\" and \"" + runtime_out + "\"");
 }
 
 void AeraVisualizerWindow::zoomIn()
@@ -2067,7 +2072,7 @@ void AeraVisualizerWindow::fitAll() {
 
 void AeraVisualizerWindow::createActions()
 {
-  newInstanceAction_ = new QAction(tr("&Load New settings.xml"), this);
+  newInstanceAction_ = new QAction(tr("&Load new settings.xml"), this);
   newInstanceAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
   newInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
   connect(newInstanceAction_, SIGNAL(triggered()), this, SLOT(loadNewSeed()));
