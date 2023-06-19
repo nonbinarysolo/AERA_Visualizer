@@ -92,6 +92,10 @@ class AeraVisualizerWindowBase : public QMainWindow
 {
   Q_OBJECT
 
+public:
+  // Used to turn the player controls on or off
+  void setPlayerUIEnabled(bool enabled);
+
 protected:
   /**
    * Create an AeraVisualizerWindowBase and create the player control panel widget. This is 

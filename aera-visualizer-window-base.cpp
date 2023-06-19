@@ -153,6 +153,12 @@ void AeraVisualizerWindowBase::playTimeLabelClicked()
     ((AeraVisualizerWindow*)this)->playTimeLabelClickedImpl();
 }
 
+void AeraVisualizerWindowBase::setPlayerUIEnabled(bool enabled) {
+  playPauseButton_->setEnabled(enabled);
+  stepBackButton_->setEnabled(enabled);
+  stepButton_->setEnabled(enabled);
+}
+
 ClickableLabel::ClickableLabel(const QString& text, QWidget* parent, Qt::WindowFlags f)
   : QLabel(text, parent) {}
 

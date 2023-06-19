@@ -300,7 +300,7 @@ private:
   void setUIEnabled(bool enabled);
 
   void playPauseButtonClickedImpl();
-  void stepButtonClickedImpl();
+  void stepButtonClickedImpl();       // Don't call until AERA loaded
   void stepBackButtonClickedImpl();
   void playTimeLabelClickedImpl();
   void timerEvent(QTimerEvent* event) override;

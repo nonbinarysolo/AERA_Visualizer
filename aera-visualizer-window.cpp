@@ -2290,6 +2290,9 @@ void AeraVisualizerWindow::setUIEnabled(bool enabled) {
   instantiatedModelsCheckBox_->setEnabled(enabled);
   predictedInstantiatedCompositeStatesCheckBox_->setEnabled(enabled);
   requirementsCheckBox_->setEnabled(enabled);
+
+  // Parent window
+  setPlayerUIEnabled(enabled);
 }
 
 }
