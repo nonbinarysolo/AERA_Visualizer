@@ -77,6 +77,11 @@ public:
 	 */
 	SemanticsView(ReplicodeObjects replicodeObjects, AeraVisualizerWindow* mainWindow);
 
+	// Used to update the replicodeObjects during live operation
+	void setReplicodeObjects(ReplicodeObjects* replicodeObjects) {
+		modelsScene_->setReplicodeObjects(replicodeObjects);
+	}
+
 	// Make this available so it can be updated by the main window
 	AeraVisualizerScene* getModelsScene() { return modelsScene_; }
 

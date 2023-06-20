@@ -289,20 +289,11 @@
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.cpp">
       <Filter>AERA\TCP</Filter>
     </ClCompile>
-    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.cc">
-      <Filter>AERA\TCP\Proto</Filter>
-    </ClCompile>
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.cpp">
       <Filter>AERA\video_screen</Filter>
     </ClCompile>
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.cpp">
       <Filter>AERA\video_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="views\explanation-log.cpp">
-      <Filter>views</Filter>
-    </ClCompile>
-    <ClCompile Include="views\semantics.cpp">
-      <Filter>views</Filter>
     </ClCompile>
     <ClCompile Include="submodules\AERA\usr_operators\usr_operators.cpp">
       <Filter>usr_operators</Filter>
@@ -315,6 +306,21 @@
     </ClCompile>
     <ClCompile Include="submodules\AERA\usr_operators\TestProgram\test_program.cpp">
       <Filter>usr_operators\TestProgram</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\usr_operators\Callbacks\callbacks.cpp">
+      <Filter>usr_operators\Callbacks</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\main.cpp">
+      <Filter>AERA</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_data_message.pb.cc">
+      <Filter>AERA\TCP\AERA_Protobuf</Filter>
+    </ClCompile>
+    <ClCompile Include="views\explanation-log.cpp">
+      <Filter>views</Filter>
+    </ClCompile>
+    <ClCompile Include="views\semantics.cpp">
+      <Filter>views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -593,20 +599,11 @@
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.h">
       <Filter>AERA\TCP</Filter>
     </ClInclude>
-    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.pb.h">
-      <Filter>AERA\TCP\Proto</Filter>
-    </ClInclude>
-    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\Proto\utils.h">
-      <Filter>AERA\TCP\Proto</Filter>
-    </ClInclude>
     <ClInclude Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.h">
       <Filter>AERA\video_screen</Filter>
     </ClInclude>
     <ClInclude Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.h">
       <Filter>AERA\video_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="submodules\AERA\AERA\AERA_main.h">
-      <Filter>AERA</Filter>
     </ClInclude>
     <ClInclude Include="submodules\AERA\usr_operators\types.h">
       <Filter>usr_operators</Filter>
@@ -614,14 +611,23 @@
     <ClInclude Include="submodules\AERA\usr_operators\usr_operators.h">
       <Filter>usr_operators</Filter>
     </ClInclude>
-    <ClInclude Include="submodules\AERA\usr_operators\Callbacks\callbacks.h">
-      <Filter>usr_operators\Callbacks</Filter>
-    </ClInclude>
     <ClInclude Include="submodules\AERA\usr_operators\Operators\operators.h">
       <Filter>usr_operators\Operators</Filter>
     </ClInclude>
     <ClInclude Include="submodules\AERA\usr_operators\TestProgram\test_program.h">
       <Filter>usr_operators\TestProgram</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\usr_operators\Callbacks\callbacks.h">
+      <Filter>usr_operators\Callbacks</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\main.h">
+      <Filter>AERA</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_data_message.pb.h">
+      <Filter>AERA\TCP\AERA_Protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\utils.h">
+      <Filter>AERA\TCP\AERA_Protobuf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -657,11 +663,6 @@
     <QtRcc Include="aera_visualizer.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-      <ParseFiles>true</ParseFiles>
-    </Filter>
     <Filter Include="CoreLibrary">
       <UniqueIdentifier>{4661bd21-5c81-4926-8264-de72870e17d1}</UniqueIdentifier>
     </Filter>
@@ -683,34 +684,29 @@
     <Filter Include="images">
       <UniqueIdentifier>{0c46a924-114d-4f51-ab3b-c17420510b01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-      <ParseFiles>true</ParseFiles>
-    </Filter>
     <Filter Include="AERA">
       <UniqueIdentifier>{1700dbb8-d407-4371-8464-3cd5441be005}</UniqueIdentifier>
     </Filter>
     <Filter Include="AERA\TCP">
       <UniqueIdentifier>{56b30223-17c7-4452-8952-f5a3d1d61655}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AERA\TCP\Proto">
-      <UniqueIdentifier>{87fa3823-719a-413e-a685-93bf8e623e16}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AERA\video_screen">
       <UniqueIdentifier>{f6c7d77b-50fa-4ec4-b066-14ac5943103c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="views">
-      <UniqueIdentifier>{446a57c5-a999-4b4f-8e0d-2990451d43d0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usr_operators\Callbacks">
-      <UniqueIdentifier>{3fe7ffd6-3078-42f9-8d8e-7db126a2fb0a}</UniqueIdentifier>
+      <UniqueIdentifier>{ecafbbf5-d886-4965-aeeb-bc61cd2cdfdf}</UniqueIdentifier>
     </Filter>
     <Filter Include="usr_operators\Operators">
-      <UniqueIdentifier>{952634ed-a3b7-493e-894c-c4a9950e868a}</UniqueIdentifier>
+      <UniqueIdentifier>{22415666-9a12-4fe3-ac53-c8f999199933}</UniqueIdentifier>
     </Filter>
     <Filter Include="usr_operators\TestProgram">
-      <UniqueIdentifier>{21d673f2-b5fa-4043-8160-04b7b1fdca56}</UniqueIdentifier>
+      <UniqueIdentifier>{879a16b2-cbbb-4d5b-936b-e2b33accdaf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AERA\TCP\AERA_Protobuf">
+      <UniqueIdentifier>{87fa3823-719a-413e-a685-93bf8e623e16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="views">
+      <UniqueIdentifier>{b52052e6-842a-4ea7-8d49-098cb620080a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -729,11 +725,8 @@
     <None Include="submodules\AERA\r_exec\r_exec.vcxproj">
       <Filter>r_exec</Filter>
     </None>
-    <None Include="submodules\AERA\AERA\IODevices\TCP\Proto\ReadMe.md">
-      <Filter>AERA\TCP\Proto</Filter>
-    </None>
-    <None Include="submodules\AERA\AERA\IODevices\TCP\Proto\tcp_data_message.proto">
-      <Filter>AERA\TCP\Proto</Filter>
+    <None Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_data_message.proto">
+      <Filter>AERA\TCP\AERA_Protobuf</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

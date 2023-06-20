@@ -73,7 +73,12 @@ public:
    * \param mainWindow The main parent window for this window.
    * \param replicodeObjects The ReplicodeObjects used to find objects.
    */
-  ExplanationLogView(AeraVisualizerWindow* mainWindow, ReplicodeObjects& replicodeObjects);
+  ExplanationLogView(AeraVisualizerWindow* mainWindow);
+
+  // Used to update the replicodeObjects during live operation
+  void setReplicodeObjects(ReplicodeObjects* replicodeObjects) {
+    replicodeObjects_ = replicodeObjects;
+  }
 
   void appendHtml(const QString& html)
   {
@@ -106,7 +111,7 @@ private:
   friend TextBrowser;
 
   AeraVisualizerWindow* mainWindow_;
-  ReplicodeObjects replicodeObjects_;
+  ReplicodeObjects* replicodeObjects_;
 
   // TODO: We should be able to use textBrowser_ to append HTML.
   QString html_;

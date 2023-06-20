@@ -72,7 +72,7 @@ SemanticsView::SemanticsView(ReplicodeObjects replicodeObjects, AeraVisualizerWi
 	container->setObjectName("container");
 	//container->setStyleSheet("QWidget#container { background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 0, 0); }");
 
-	modelsScene_ = new AeraVisualizerScene(replicodeObjects, mainWindow, false);
+	modelsScene_ = new AeraVisualizerScene(mainWindow, false);
 
 	
 	zoomInAction_ = new QAction(QIcon(":/images/zoom-in.png"), tr("Zoom In"), this);

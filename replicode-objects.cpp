@@ -4,6 +4,7 @@
 //_/_/ 
 //_/_/ Copyright (c) 2018-2023 Jeff Thompson
 //_/_/ Copyright (c) 2018-2023 Kristinn R. Thorisson
+//_/_/ Copyright (c) 2023 Chloe Schaff
 //_/_/ Copyright (c) 2018-2023 Icelandic Institute for Intelligent Machines
 //_/_/ http://www.iiim.is
 //_/_/
@@ -58,9 +59,13 @@
 #include "submodules/AERA/r_comp/compiler.h"
 #include "submodules/AERA/r_comp/decompiler.h"
 #include "submodules/AERA/r_exec/model_base.h"
+#include "submodules/AERA/r_exec/opcodes.h"
+#include "submodules/AERA/AERA/main.h"
 #include "replicode-objects.hpp"
 #include <QApplication>
 #include <QProgressDialog>
+
+#include <QMessageBox>
 
 using namespace std;
 using namespace std::chrono;
@@ -71,20 +76,30 @@ using namespace r_exec;
 
 namespace aera_visualizer {
 
+  dll_export r_comp::Compiler Compiler;
+
 ReplicodeObjects::ReplicodeObjects()
 : intMemberRegex_("( ?\\d+)")
 {
+  // Set up progressLines_. Used by getProgressLabelText to make the progress messages clearer.
+  progressMessages_.push_back("Snapshotting AERA state");
+  progressMessages_.push_back("Retrieving objects");
+  progressMessages_.push_back("Postprocessing code");
+  progressMessages_.push_back("Reading runtime output");
+  progressMessages_.push_back("Setting up workspace");
+}
+
+string ReplicodeObjects::init(const string& userClassesFilePath, const string& decompiledFilePath,
+    microseconds basePeriod, QProgressDialog& progress)
+{
+  // TO DO: These will need to be reconciled with the slightly different ones of the other init
   // Set up progressLines_. Used by getProgressLabelText to make the progress messages clearer.
   progressMessages_.push_back("Preprocessing code (1 of 2)");
   progressMessages_.push_back("Preprocessing code (2 of 2)");
   progressMessages_.push_back("Compiling code");
   progressMessages_.push_back("Postprocessing code");
   progressMessages_.push_back("Reading runtime output");
-}
 
-string ReplicodeObjects::init(const string& userClassesFilePath, const string& decompiledFilePath,
-    microseconds basePeriod, QProgressDialog& progress)
-{
   basePeriod_ = basePeriod;
 
   // Run the proprocessor on the user operators (which includes std.replicode) just to
@@ -136,7 +151,7 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
     return error;
 
   istringstream preprocessedIn(preprocessedOut.str());
-  Compiler compiler(true);
+  r_comp::Compiler compiler(true);
   r_comp::Image image;
 
   progress.setLabelText(getProgressLabelText("Compiling code"));
@@ -273,6 +288,172 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
 
   return "";
 }
+
+
+string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QProgressDialog& progress)
+{
+  // Store this
+  basePeriod_ = basePeriod;
+
+  progress.setLabelText(getProgressLabelText("Snapshotting AERA state"));
+  QApplication::processEvents();
+  if (progress.wasCanceled())
+    return "cancel";
+
+  // Get current state of AERA
+  r_comp::Image* image = aera->getObjectsImage();   // Get objects from AERA's memory
+  r_comp::Metadata metadata = aera->getMetadata();  // Retreve metadata to interpret objects image
+  
+  progress.setLabelText(getProgressLabelText("Retrieving objects"));
+  QApplication::processEvents();
+  if (progress.wasCanceled())
+    return "cancel";
+  
+  // Transfer objects from the compiler image to imageObjects.
+  resized_vector<Code*> imageObjects;
+  image->get_objects(_Mem::Get(), imageObjects);
+  //image->get_objects(aera->mem_, imageObjects);
+  
+  // We update progress for 3 loops of imageObjects.size().
+  progress.setLabelText(getProgressLabelText("Postprocessing code"));
+  progress.setMaximum(imageObjects.size() * 3);
+
+  // Assign object labels. All internal references use OIDs, detail OIDs, or reference
+  // so the labels can be assigned more or less arbitrarily. If available, we'll use
+  // the name used in the seed program. If not,  this code follows the convention for
+  // runtime_out.txt (search for the macro `OUTPUT_LINE`).
+  
+  // Use these names where available
+  std::unordered_map<uint32, std::string> seedNames = aera->getSeedNames().symbols_;
+
+  // Some objects don't have an OID so just assign them a sequential one
+  int anonOID = 0;
+
+  for (auto i = 0; i < imageObjects.size(); ++i) {
+    if (progress.wasCanceled())
+      return "cancel";
+    progress.setValue(i);
+    if (i % 100 == 0)
+      QApplication::processEvents();
+
+    Code* object = imageObjects[i];
+    int oid = object->get_oid();
+    string label;
+
+    // If a name already exists, use it
+    if (seedNames.find(oid) != seedNames.end())
+      label = seedNames[oid];
+
+    // If not, assign it as CLASS_OID or similar
+    else {
+      // Retrieve prefix from opcode
+      string prefix = metadata.classes_by_opcodes_[object->code(0).asOpcode()].str_opcode;
+
+      // Some objects don't have OIDs so assign one
+      if (oid == -1) {
+        label = prefix + std::to_string(anonOID);
+        imageObjects[i]->set_oid(anonOID);
+        anonOID++;
+      }
+      else
+        label = prefix + "_" + std::to_string(oid);
+    }
+   
+    // Save to objectLabel and labelObject
+    objectLabel_[imageObjects[i]] = label;
+    labelObject_[label] = imageObjects[i];
+  }
+
+  // Transfer imageObjects to objects_, unpacking and processing as needed.
+  // Imitate _Mem::load.
+  for (uint32 i = 0; i < imageObjects.size(); ++i) {
+    Code* object = imageObjects[i];
+    int32 dummyLocation;
+    objects_.push_back(object, dummyLocation);
+    // We don't need to delete, so don't set the storage index.
+
+    switch (object->code(0).getDescriptor()) {
+    case Atom::MODEL:
+      _Mem::unpack_hlp(object);
+      r_exec::ModelBase::Get()->load(object);
+      break;
+    case Atom::COMPOSITE_STATE:
+      _Mem::unpack_hlp(object);
+      break;
+    case Atom::INSTANTIATED_PROGRAM: // refine the opcode depending on the inputs and the program type.
+      if (object->get_reference(0)->code(0).asOpcode() == Opcodes::Pgm) {
+
+        if (object->get_reference(0)->code(object->get_reference(0)->code(PGM_INPUTS).asIndex()).getAtomCount() == 0)
+          object->code(0) = Atom::InstantiatedInputLessProgram(object->code(0).asOpcode(), object->code(0).getAtomCount());
+      }
+      else
+        object->code(0) = Atom::InstantiatedAntiProgram(object->code(0).asOpcode(), object->code(0).getAtomCount());
+      break;
+    }
+
+    for (auto v = object->views_.begin(); v != object->views_.end(); ++v) {
+
+      // init hosts' member_set.
+      View* view = (View*)*v;
+      view->set_object(object);
+      Group* host = view->get_host();
+
+#if 0 // debug: host is NULL.
+      if (!host->load(view, object))
+        return false;
+#endif
+    }
+  }
+
+  // Make sure to set this
+  timeReference_ = aera->getStartTime();
+
+  // Get the source code by decompiling the packed objects in objects_
+  r_comp::Image packedImage;
+  packedImage.object_names_.symbols_ = image->object_names_.symbols_;
+  packedImage.add_objects(objects_, true);
+
+  Decompiler decompiler;
+  decompiler.init(&metadata);
+
+  // Copy labels into objectNames for the decopiler
+  int i = 0;
+  unordered_map<uint16, std::string> objectNames;
+  for (auto o = objects_.begin(); o != objects_.end(); ++o) {
+    if (progress.wasCanceled())
+      return "cancel";
+    progress.setValue(imageObjects.size() + i);
+    if (i % 100 == 0)
+      QApplication::processEvents();
+
+    objectNames[i] = objectLabel_[*o];
+    i++;
+  }
+  decompiler.decompile_references(&packedImage, &objectNames);
+
+  for (uint16 i = 0; i < packedImage.code_segment_.objects_.size(); ++i) {
+    if (progress.wasCanceled())
+      return "cancel";
+    progress.setValue(2 * imageObjects.size() + i);
+    if (i % 100 == 0)
+      QApplication::processEvents();
+
+    auto object = getObjectByDetailOid(packedImage.code_segment_.objects_[i]->detail_oid_);
+    if (object) {
+      std::ostringstream decompiledCode;
+      decompiler.decompile_object(i, &decompiledCode, timeReference_, false, false, false);
+      auto source = decompiledCode.str();
+
+      // Strip ending newlines.
+      while (source[source.size() - 1] == '\n')
+        source = source.substr(0, source.size() - 1);
+      objectSourceCode_[object] = source;
+    }
+  }
+  
+  return "";
+}
+
 
 string ReplicodeObjects::processDecompiledObjects(
   string decompiledFilePath, map<string, uint32>& objectOids, map<string, uint64>& objectDetailOids)
