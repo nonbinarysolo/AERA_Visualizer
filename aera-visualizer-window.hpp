@@ -91,10 +91,9 @@ class AeraVisualizerWindow : public AeraVisualizerWindowBase
 
 public:
   /**
-   * Create an AeraVisualizerWindow. After creating the window, call addEvents().
-   * \param replicodeObjects The ReplicodeObjects used to find objects.
+   * Create an AeraVisualizerWindow
    */
-  AeraVisualizerWindow(ReplicodeObjects& replicodeObjects);
+  AeraVisualizerWindow();
 
   /**
    * Scan the runtimeOutputFilePath and add to startupEvents_ and events_. Call this once after creating the window.
@@ -232,6 +231,9 @@ protected:
   FindDialog* findDialog_;
 
 private slots:
+  void loadNewSeed();
+  void openOutput();
+  void saveOutput();
   void zoomIn();
   void zoomOut();
   void zoomHome();
@@ -248,6 +250,12 @@ private:
   void createToolbars();
 
   QToolBar* timelineControls_;
+
+  /**
+  * Snapshots another images of AERA's state and reads in new lines from
+  * runtime_out.txt. This should be done after advancing AERA forwards.
+  */
+  void updateObjectsAndEvents();
 
   /**
    * Get the time stamp from the decimal strings of seconds, milliseconds and
@@ -288,20 +296,32 @@ private:
    */
   void abaNewStep(int step);
 
+  // Use these to turn the UI on and off depending on whether anything is currently loaded
+  void setUIEnabled(bool enabled);
+
   void playPauseButtonClickedImpl();
-  void stepButtonClickedImpl();
+  void stepButtonClickedImpl();       // Don't call until AERA loaded
   void stepBackButtonClickedImpl();
   void playTimeLabelClickedImpl();
   void timerEvent(QTimerEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
-  AeraVisualizerScene* mainScene_;
-  AeraVisualizerScene* selectedScene_;
-
   SemanticsView* semanticsView_;
   QDockWidget* playerControlView_;
 
+  AERA_interface* aera_;
+  ReplicodeObjects replicodeObjects_;
+
+  AeraVisualizerScene* modelsScene_;
+  AeraVisualizerScene* mainScene_;
+  AeraVisualizerScene* selectedScene_;
+
+  QAction* newInstanceAction_;
+  QAction* loadOutputAction_;
+  QAction* saveOutputAction_;
   QAction* exitAction_;
+  QAction* resetAERAInstanceAction_;
+  QAction* configureAERAInstanceAction_;
   QAction* zoomInAction_;
   QAction* zoomOutAction_;
   QAction* zoomHomeAction_;
@@ -341,6 +361,7 @@ private:
   r_code::Code* essencePropertyObject_;
   QColor phasedOutModelColor_;
 
+  int lastLine_ = 0;      // The farthest we've read into runtime_out.txt
   bool showRelativeTime_;
   core::Timestamp playTime_;
   int playTimerId_;

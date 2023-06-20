@@ -4,6 +4,7 @@
 //_/_/ 
 //_/_/ Copyright (c) 2018-2023 Jeff Thompson
 //_/_/ Copyright (c) 2018-2023 Kristinn R. Thorisson
+//_/_/ Copyright (c) 2023 Chloe Schaff
 //_/_/ Copyright (c) 2018-2023 Icelandic Institute for Intelligent Machines
 //_/_/ http://www.iiim.is
 //_/_/
@@ -59,6 +60,7 @@
 #include <regex>
 #include <QString>
 #include "submodules/AERA/r_exec/mem.h"
+#include "submodules/AERA/AERA/main.h"
 
 class QProgressDialog;
 
@@ -88,6 +90,8 @@ public:
    */
   std::string init(const std::string& userClassesFilePath, const std::string& decompiledFilePath,
     std::chrono::microseconds basePeriod, QProgressDialog& progress);
+
+  std::string init(AERA_interface* aera, std::chrono::microseconds basePeriod, QProgressDialog& progress);
 
   /**
    * Get the sampling period, which is 2 * base_period from settings.xml. This should

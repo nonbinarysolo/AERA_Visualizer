@@ -81,13 +81,18 @@ class FindDialog : public QDialog
     * \param parentWindow The main window of the visualizer
     * \param replicodeObjects All decompiled objects
     */
-    FindDialog(AeraVisualizerWindow* parentWindow, ReplicodeObjects& replicodeObjects);
+    FindDialog(AeraVisualizerWindow* parentWindow);
 
     // The stepEvent and unstepEvent functions in AeraVisualizerWindow use this to notify the
     // find dialog that it should refresh its matches (don't put much here since it's called A LOT)
     void reportStepEvent() {
       timeSteppedFlag_ = true;
       highlightAllFlag_ = true;
+    }
+
+    // Used to update the replicodeObjects during live operation
+    void setReplicodeObjects(ReplicodeObjects* replicodeObjects) {
+      replicodeObjects_ = replicodeObjects;
     }
 
 
@@ -154,7 +159,7 @@ class FindDialog : public QDialog
 
     // References to the main window
     AeraVisualizerWindow* parentWindow_;
-    ReplicodeObjects replicodeObjects_;
+    ReplicodeObjects* replicodeObjects_;
 
     // UI Elements
     QLineEdit* input_;

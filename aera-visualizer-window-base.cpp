@@ -63,10 +63,9 @@ using namespace r_code;
 
 namespace aera_visualizer {
 
-AeraVisualizerWindowBase::AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow, ReplicodeObjects& replicodeObjects)
+AeraVisualizerWindowBase::AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow)
 : QMainWindow(mainWindow),
-  mainWindow_(mainWindow),
-  replicodeObjects_(replicodeObjects)
+  mainWindow_(mainWindow)
 {
   createPlayerControlPanel();
 
@@ -156,6 +155,12 @@ void AeraVisualizerWindowBase::playTimeLabelClicked()
   else
     // This is the main window.
     ((AeraVisualizerWindow*)this)->playTimeLabelClickedImpl();
+}
+
+void AeraVisualizerWindowBase::setPlayerUIEnabled(bool enabled) {
+  playPauseButton_->setEnabled(enabled);
+  stepBackButton_->setEnabled(enabled);
+  stepButton_->setEnabled(enabled);
 }
 
 ClickableLabel::ClickableLabel(const QString& text, QWidget* parent, Qt::WindowFlags f)
