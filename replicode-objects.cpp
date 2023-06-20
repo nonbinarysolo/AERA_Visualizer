@@ -312,6 +312,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   // Transfer objects from the compiler image to imageObjects.
   resized_vector<Code*> imageObjects;
   image->get_objects(_Mem::Get(), imageObjects);
+  //image->get_objects(aera->mem_, imageObjects);
   
   // We update progress for 3 loops of imageObjects.size().
   progress.setLabelText(getProgressLabelText("Postprocessing code"));
@@ -407,7 +408,7 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
   // Make sure to set this
   timeReference_ = aera->getStartTime();
 
-  // Get the source code by decompiling the packet objects in objects_
+  // Get the source code by decompiling the packed objects in objects_
   r_comp::Image packedImage;
   packedImage.object_names_.symbols_ = image->object_names_.symbols_;
   packedImage.add_objects(objects_, true);
