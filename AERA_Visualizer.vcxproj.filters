@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="aera-visualizer-window-base.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="aera-visualizer-window.cpp" />
     <ClCompile Include="submodules\AERA\submodules\CoreLibrary\CoreLibrary\base.cpp">
@@ -320,6 +319,9 @@
       <Filter>views</Filter>
     </ClCompile>
     <ClCompile Include="views\semantics.cpp">
+      <Filter>views</Filter>
+    </ClCompile>
+    <ClCompile Include="views\player.cpp">
       <Filter>views</Filter>
     </ClCompile>
     <ClCompile Include="graphics-items\reduction-marker-item.cpp">
@@ -717,13 +719,15 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="aera-visualizer-window.hpp" />
-    <QtMoc Include="aera-visualizer-window-base.hpp" />
     <QtMoc Include="aera-checkbox.h" />
     <QtMoc Include="find-dialog.hpp" />
     <QtMoc Include="views\explanation-log.hpp">
       <Filter>views</Filter>
     </QtMoc>
     <QtMoc Include="views\semantics.hpp">
+      <Filter>views</Filter>
+    </QtMoc>
+    <QtMoc Include="views\player.hpp">
       <Filter>views</Filter>
     </QtMoc>
   </ItemGroup>

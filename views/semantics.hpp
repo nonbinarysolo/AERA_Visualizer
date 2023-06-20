@@ -72,10 +72,9 @@ class SemanticsView : public QDockWidget
 public:
 	/**
 	 * Create a SemanticsView.
-	 * \param replicodeObjects The ReplicodeObjects used to find objects.
 	 * \param mainWindow The main parent window for this window.
 	 */
-	SemanticsView(ReplicodeObjects replicodeObjects, AeraVisualizerWindow* mainWindow);
+	SemanticsView(AeraVisualizerWindow* mainWindow);
 
 	// Used to update the replicodeObjects during live operation
 	void setReplicodeObjects(ReplicodeObjects* replicodeObjects) {

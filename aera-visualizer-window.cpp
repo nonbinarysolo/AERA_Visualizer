@@ -89,6 +89,7 @@
 #include "find-dialog.hpp"
 #include "views/explanation-log.hpp"
 #include "views/semantics.hpp"
+#include "views/player.hpp"
 
 #include <QtWidgets>
 #include <QProgressDialog>
@@ -174,15 +175,11 @@ const QString AeraVisualizerWindow::SettingsKeyPredictedInstantiatedCompositeSta
 const QString AeraVisualizerWindow::SettingsKeyRequirementsVisible = "requirementsVisible";
 
 AeraVisualizerWindow::AeraVisualizerWindow()
-: AeraVisualizerWindowBase(0),
+: QMainWindow(0),
   iNextEvent_(0), explanationLogView_(0),
-  essencePropertyObject_(NULL),//(replicodeObjects_.getObject("essence")),
+  essencePropertyObject_(NULL),
   hoverHighlightItem_(0),
   phasedOutModelColor_(255, 192, 192),
-  showRelativeTime_(true),
-  playTime_(seconds(0)),
-  playTimerId_(0),
-  isPlaying_(false),
   itemBorderHighlightPen_(Qt::blue, 3)
 {
   createActions();
@@ -1688,95 +1685,6 @@ Timestamp AeraVisualizerWindow::unstepEvent(Timestamp minimumTime, bool& foundGr
     return Timestamp(seconds(0));
 }
 
-void AeraVisualizerWindow::startPlay()
-{
-  if (isPlaying_)
-    // Already playing.
-    return;
-
-  playPauseButton_->setIcon(pauseIcon_);
-  for (size_t i = 0; i < children_.size(); ++i)
-    children_[i]->playPauseButton_->setIcon(pauseIcon_);
-  isPlaying_ = true;
-  if (playTimerId_ == 0)
-    playTimerId_ = startTimer(AeraVisualizer_playTimerTick.count());
-}
-
-void AeraVisualizerWindow::stopPlay()
-{
-  if (playTimerId_ != 0) {
-    killTimer(playTimerId_);
-    playTimerId_ = 0;
-  }
-
-  playPauseButton_->setIcon(playIcon_);
-  for (size_t i = 0; i < children_.size(); ++i)
-    children_[i]->playPauseButton_->setIcon(playIcon_);
-  isPlaying_ = false;
-}
-
-void AeraVisualizerWindow::setPlayTime(Timestamp time)
-{
-  playTime_ = time;
-
-  uint64 total_us;
-  if (showRelativeTime_)
-    total_us = duration_cast<microseconds>(time - replicodeObjects_.getTimeReference()).count();
-  else
-    total_us = duration_cast<microseconds>(time.time_since_epoch()).count();
-  uint64 us = total_us % 1000;
-  uint64 ms = total_us / 1000;
-  uint64 s = ms / 1000;
-  ms = ms % 1000;
-
-  char buffer[100];
-  if (showRelativeTime_)
-    sprintf(buffer, "%03ds:%03dms:%03dus", (int)s, (int)ms, (int)us);
-  else {
-    // Get the UTC time.
-    time_t gmtTime = s;
-    struct tm* t = gmtime(&gmtTime);
-    sprintf(buffer, "%04d-%02d-%02d   UTC\n%02d:%02d:%02d:%03d:%03d",
-      t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-      t->tm_hour, t->tm_min, t->tm_sec, (int)ms, (int)us);
-  }
-  playTimeLabel_->setText(buffer);
-  for (size_t i = 0; i < children_.size(); ++i)
-    children_[i]->playTimeLabel_->setText(buffer);
-
-  QSettings settings;
-  // If auto scroll is enabled, ensure the new item is visible
-  if (mainScene_ && settings.value("AutoScroll", Qt::Unchecked).toInt() == Qt::Checked) {
-    mainScene_->scrollToTimestamp(time);
-  }
-}
-
-void AeraVisualizerWindow::setSliderToPlayTime()
-{
-  if (events_.size() == 0) {
-    playSlider_->setValue(0);
-    for (size_t i = 0; i < children_.size(); ++i)
-      children_[i]->playSlider_->setValue(0);
-    return;
-  }
-
-  auto maximumEventTime = events_.back()->time_;
-  int value = playSlider_->maximum() * 
-    ((double)duration_cast<microseconds>(playTime_ - replicodeObjects_.getTimeReference()).count() /
-     duration_cast<microseconds>(maximumEventTime - replicodeObjects_.getTimeReference()).count());
-  playSlider_->setValue(value);
-  for (size_t i = 0; i < children_.size(); ++i)
-    children_[i]->playSlider_->setValue(value);
-}
-
-void AeraVisualizerWindow::playPauseButtonClickedImpl()
-{
-  if (isPlaying_)
-    stopPlay();
-  else
-    startPlay();
-}
-
 void AeraVisualizerWindow::stepButtonClickedImpl()
 {
   // Run AERA a bit more
@@ -1788,10 +1696,10 @@ void AeraVisualizerWindow::stepButtonClickedImpl()
   // Update everything
   updateObjectsAndEvents();
   
-  setPlayTime(replicodeObjects_.getTimeReference());
-  setSliderToPlayTime();
+  playerView_->setPlayTime(replicodeObjects_.getTimeReference());
+  playerView_->setSliderToPlayTime();
 
-  stopPlay();
+  playerView_->stopPlay();
   size_t iNextStepEvent;
   if (getINextStepEvent(Utils_MaxTime, iNextEvent_, iNextStepEvent) == Utils_MaxTime)
     return;
@@ -1864,13 +1772,13 @@ void AeraVisualizerWindow::stepButtonClickedImpl()
     }
   }
 
-  setPlayTime(eventTime);
-  setSliderToPlayTime();
+  playerView_->setPlayTime(eventTime);
+  playerView_->setSliderToPlayTime();
 }
 
 void AeraVisualizerWindow::stepBackButtonClickedImpl()
 {
-  stopPlay();
+  playerView_->stopPlay();
   bool foundGraphicsItem;
   auto newTime = max(unstepEvent(Timestamp(seconds(0)), foundGraphicsItem), replicodeObjects_.getTimeReference());
   if (newTime == Utils_MaxTime)
@@ -1892,32 +1800,19 @@ void AeraVisualizerWindow::stepBackButtonClickedImpl()
     newTime = localNewTime;
   }
 
-  setPlayTime(max(newTime, replicodeObjects_.getTimeReference()));
-  setSliderToPlayTime();
+  playerView_->setPlayTime(max(newTime, replicodeObjects_.getTimeReference()));
+  playerView_->setSliderToPlayTime();
 }
 
-void AeraVisualizerWindow::playTimeLabelClickedImpl()
-{
-  showRelativeTime_ = !showRelativeTime_;
-  setPlayTime(playTime_);
-}
-
-void AeraVisualizerWindow::timerEvent(QTimerEvent* event)
-{
-  // TODO: Make sure we don't re-enter.
-
-  if (event->timerId() != playTimerId_)
-    // This timer event is not for us.
-    return;
-
+void AeraVisualizerWindow::timerTick() {
   if (events_.size() == 0) {
-    stopPlay();
+    playerView_->stopPlay();
     return;
   }
 
   auto maximumEventTime = events_.back()->time_;
   // TODO: Make this track the passage of real clock time.
-  auto playTime = playTime_ + AeraVisualizer_playTimerTick;
+  auto playTime = playerView_->getPlayTime() + AeraVisualizer_playTimerTick;
 
   // Step events while events_[iNextEvent_] is less than or equal to the playTime.
   // Debug: How to step the children also?
@@ -1926,11 +1821,11 @@ void AeraVisualizerWindow::timerEvent(QTimerEvent* event)
   if (iNextEvent_ >= events_.size()) {
     // We have played all events.
     playTime = maximumEventTime;
-    stopPlay();
+    playerView_->stopPlay();
   }
 
-  setPlayTime(playTime);
-  setSliderToPlayTime();
+  playerView_->setPlayTime(playTime);
+  playerView_->setSliderToPlayTime();
 }
 
 void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
@@ -2024,6 +1919,7 @@ void AeraVisualizerWindow::updateObjectsAndEvents()
   essencePropertyObject_ = replicodeObjects_.getObject("essence");
   explanationLogView_->setReplicodeObjects(&replicodeObjects_);
   semanticsView_->setReplicodeObjects(&replicodeObjects_);
+  playerView_->setTimeReference(replicodeObjects_.getTimeReference());
   findDialog_->setReplicodeObjects(&replicodeObjects_);
   mainScene_->setReplicodeObjects(&replicodeObjects_);
 
@@ -2106,7 +2002,7 @@ void AeraVisualizerWindow::createDockWidgets() {
   setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 
   // Set up the semantics view
-  semanticsView_ = new SemanticsView(replicodeObjects_, this);
+  semanticsView_ = new SemanticsView(this);
   semanticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
   addDockWidget(Qt::LeftDockWidgetArea, semanticsView_);
   
@@ -2114,12 +2010,10 @@ void AeraVisualizerWindow::createDockWidgets() {
   explanationLogView_ = new ExplanationLogView(this);
   addDockWidget(Qt::RightDockWidgetArea, explanationLogView_);
 
-  // Make the timeline a fixed dock widget so it's always at the bottom of the window
-  playerControlView_ = new QDockWidget("Player Control Panel", this);
-  playerControlView_->setWidget(getPlayerControlPanel());
-  playerControlView_->setFeatures(QDockWidget::NoDockWidgetFeatures);
-  playerControlView_->setTitleBarWidget(new QWidget());
-  addDockWidget(Qt::BottomDockWidgetArea, playerControlView_);
+  // Make the player a fixed dock widget so it's always at the bottom of the window
+  playerView_ = new PlayerView(this);
+  playerView_->setFeatures(QDockWidget::NoDockWidgetFeatures);
+  addDockWidget(Qt::BottomDockWidgetArea, playerView_);
 }
 
 void AeraVisualizerWindow::createActions()
@@ -2332,8 +2226,8 @@ void AeraVisualizerWindow::setUIEnabled(bool enabled) {
   predictedInstantiatedCompositeStatesCheckBox_->setEnabled(enabled);
   requirementsCheckBox_->setEnabled(enabled);
 
-  // Parent window
-  setPlayerUIEnabled(enabled);
+  // Views
+  playerView_->setUIEnabled(enabled);
 }
 
 }

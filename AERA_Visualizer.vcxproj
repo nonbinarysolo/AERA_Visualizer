@@ -216,7 +216,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="aera-checkbox.cpp" />
-    <ClCompile Include="aera-visualizer-window-base.cpp" />
     <ClCompile Include="graphics-items\aba-sentence-item.cpp" />
     <ClCompile Include="graphics-items\aera-graphics-item-group.cpp" />
     <ClCompile Include="graphics-items\aera-graphics-item.cpp" />
@@ -360,6 +359,7 @@
     <ClCompile Include="submodules\AERA\usr_operators\TestProgram\test_program.cpp" />
     <ClCompile Include="submodules\AERA\usr_operators\usr_operators.cpp" />
     <ClCompile Include="views\explanation-log.cpp" />
+    <ClCompile Include="views\player.cpp" />
     <ClCompile Include="views\semantics.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -374,6 +374,11 @@
     <ClInclude Include="submodules\AERA\usr_operators\TestProgram\test_program.h" />
     <ClInclude Include="submodules\AERA\usr_operators\types.h" />
     <ClInclude Include="submodules\AERA\usr_operators\usr_operators.h" />
+    <QtMoc Include="views\player.hpp">
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING;WIN64;_DEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;EXECUTIVE_EXPORTS;CORELIBRARY_EXPORTS;WITH_DETAIL_OID;VISUALIZER_REMOTE;%(PreprocessorDefinitions)</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(SolutionDir)submodules\AERA\r_code;$(SolutionDir)submodules\AERA\CoreLibrary;$(SolutionDir)submodules\AERA\r_exec;$(SolutionDir)submodules\AERA\r_comp</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING;WIN64;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;EXECUTIVE_EXPORTS;CORELIBRARY_EXPORTS;WITH_DETAIL_OID;VISUALIZER_REMOTE;%(PreprocessorDefinitions)</Define>
+    </QtMoc>
     <QtMoc Include="views\semantics.hpp">
       <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING;WIN64;_DEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;EXECUTIVE_EXPORTS;CORELIBRARY_EXPORTS;WITH_DETAIL_OID;VISUALIZER_REMOTE;%(PreprocessorDefinitions)</Define>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING;WIN64;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;EXECUTIVE_EXPORTS;CORELIBRARY_EXPORTS;WITH_DETAIL_OID;VISUALIZER_REMOTE;%(PreprocessorDefinitions)</Define>
@@ -486,7 +491,6 @@
     <ClInclude Include="submodules\AERA\submodules\CoreLibrary\CoreLibrary\utils.h" />
     <ClInclude Include="submodules\AERA\submodules\CoreLibrary\CoreLibrary\xml_parser.h" />
     <ClInclude Include="submodules\AERA\usr_operators\auto_focus_callback.h" />
-    <QtMoc Include="aera-visualizer-window-base.hpp" />
     <QtMoc Include="aera-visualizer-window.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@
 //_/_/ 
 //_/_/ Copyright (c) 2018-2023 Jeff Thompson
 //_/_/ Copyright (c) 2018-2023 Kristinn R. Thorisson
+//_/_/ Copyright (c) 2023 Chloe Schaff
 //_/_/ Copyright (c) 2018-2023 Icelandic Institute for Intelligent Machines
 //_/_/ http://www.iiim.is
 //_/_/
@@ -51,17 +52,18 @@
 //_/_/ 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-#ifndef AERA_VISUALIZER_WINDOW_BASE_HPP
-#define AERA_VISUALIZER_WINDOW_BASE_HPP
+#ifndef PLAYER_HPP
+#define PLAYER_HPP
 
 #include <vector>
-#include <QMainWindow>
+#include <QDockWidget>
 #include <QPushButton>
 #include <QToolButton>
 #include <QSlider>
 #include <QLabel>
-#include "submodules/AERA/r_code/utils.h"
-#include "replicode-objects.hpp"
+#include "../submodules/AERA/r_code/utils.h"
+#include "../replicode-objects.hpp"
+#include "../aera-visualizer-window.hpp"
 
 namespace aera_visualizer {
 
@@ -84,36 +86,42 @@ protected:
 };
 
 /**
- * AeraVisualizerWindowBase extends QMainWindow and is a base class for
- * visualizer windows like AeraVisualizerWindow which manages the player
- * control panel of the main window and derived windows.
+ * PlayerView extends QDockWidget to provide a re-arrangeable way to control
+ * both AERA's and the Visualizer's timelines
  */
-class AeraVisualizerWindowBase : public QMainWindow
+class PlayerView : public QDockWidget
 {
   Q_OBJECT
 
 public:
+  /**
+  * Create a PlayerView object.
+  * \param mainWindow All button responses will call responders in mainWindow
+  */
+  PlayerView(AeraVisualizerWindow* mainWindow);
+
+  // Used to control whether we're currently playing (starts/kills timers)
+  void startPlay();
+  void stopPlay();
+
+  // Return current play time
+  core::Timestamp getPlayTime() {
+    return playTime_;
+  }
+
+  //Set playTime_ and update the playTimeLabel_.
+  void setPlayTime(core::Timestamp time);
+
+  // Set the playSlider_ position based on playTime_.
+  void setSliderToPlayTime();
+
+  // Setting the time reference from the main window's replicodeObjects_
+  void setTimeReference(core::Timestamp timeReference) {
+    timeReference_ = timeReference;
+  }
+
   // Used to turn the player controls on or off
-  void setPlayerUIEnabled(bool enabled);
-
-protected:
-  /**
-   * Create an AeraVisualizerWindowBase and create the player control panel widget. This is 
-   * called by the derived class, which should add getPlayerControlPanel() to its window.
-   * \param mainWindow The main parent window for this window, or 0 if this is already
-   * The main window.
-   * \param runtimeOutputFilePath The file path of the runtime output,
-   * typically ending in "runtime_out.txt".
-   */
-  AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow);
-
-  /**
-   * Get the player control panel widget which has a play button, slider bar and time label.
-   * The derived class should add this to its window.
-   */
-  QWidget* getPlayerControlPanel() { return playerControlPanel_;  }
-
-  AeraVisualizerWindow* mainWindow_;
+  void setUIEnabled(bool enabled);
 
 private slots:
   void playPauseButtonClicked();
@@ -123,9 +131,14 @@ private slots:
   void playTimeLabelClicked();
 
 private:
-  friend class AeraVisualizerWindow;
-  void createPlayerControlPanel();
+  void timerEvent(QTimerEvent* event) override;
 
+  AeraVisualizerWindow* mainWindow_;
+  bool isPlaying_;
+  bool showRelativeTime_;
+  int playTimerId_;
+  core::Timestamp playTime_;
+  core::Timestamp timeReference_;
   QIcon playIcon_;
   QIcon pauseIcon_;
   QToolButton* playPauseButton_;
@@ -133,9 +146,6 @@ private:
   QToolButton* stepButton_;
   QSlider* playSlider_;
   ClickableLabel* playTimeLabel_;
-
-  std::vector<AeraVisualizerWindowBase*> children_;
-  QWidget* playerControlPanel_;
 };
 
 static const std::chrono::milliseconds AeraVisualizer_playTimerTick(100);
