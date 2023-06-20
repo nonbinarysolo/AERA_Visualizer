@@ -1778,9 +1778,9 @@ void AeraVisualizerWindow::playPauseButtonClickedImpl()
 void AeraVisualizerWindow::stepButtonClickedImpl()
 {
   // Run AERA a bit more (TO DO: Only if we're not at max event time)
-  aera_->runFor(milliseconds(100)); // TO DO: This step length should be configurable
-  //aera_->mem_->run_in_diagnostic_time(milliseconds(500));
-  //aera_->diagnostic_time_state_->step();
+  // TO DO: This only works for steps >200ms. Best guess is there's a time job
+  //        in AERA that doesn't run properly with shorter steps
+  aera_->runFor(milliseconds(201));
 
   // Update everything
   updateObjectsAndEvents();
