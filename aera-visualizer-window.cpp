@@ -1777,7 +1777,7 @@ void AeraVisualizerWindow::playPauseButtonClickedImpl()
 
 void AeraVisualizerWindow::stepButtonClickedImpl()
 {
-  // Run AERA a bit more (TO DO: Only if we're not at max event time)
+  // Run AERA a bit more
   // TO DO: This only works for steps >200ms. Best guess is there's something in the interface between
   //        AERA and the Visualizer that breaks on short steps since AERA seems to do just fine with 
   //        them when run on its own.
