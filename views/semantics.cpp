@@ -65,11 +65,11 @@
 
 namespace aera_visualizer {
 
-SemanticsView::SemanticsView(ReplicodeObjects replicodeObjects, AeraVisualizerWindow* mainWindow)
+SemanticsView::SemanticsView(AeraVisualizerWindow* mainWindow)
 	: QDockWidget("Semantics View", mainWindow)
 {
 	QWidget* container = new QWidget();
-	container->setObjectName("container");
+	container->setObjectName("semantics_container");
 	//container->setStyleSheet("QWidget#container { background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 0, 0); }");
 
 	modelsScene_ = new AeraVisualizerScene(mainWindow, false);
@@ -105,7 +105,6 @@ SemanticsView::SemanticsView(ReplicodeObjects replicodeObjects, AeraVisualizerWi
 	stack->addWidget(modelsSceneView);
 	stack->addWidget(zoomControls);
 	container->setLayout(stack);
-
 
 	setWidget(container);
 }

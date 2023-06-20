@@ -59,6 +59,9 @@
 #include "../aera-visualizer-window.hpp"
 
 namespace aera_visualizer {
+
+class AeraVisualizerWindow;
+
 /**
  * ExplanationLogView extends QDockWidget to allow the user to
  * rearrange it as needed
@@ -71,7 +74,6 @@ public:
   /**
    * Create an ExplanationLogView.
    * \param mainWindow The main parent window for this window.
-   * \param replicodeObjects The ReplicodeObjects used to find objects.
    */
   ExplanationLogView(AeraVisualizerWindow* mainWindow);
 

@@ -58,13 +58,16 @@
 #include <regex>
 #include "graphics-items/aera-graphics-item.hpp"
 #include "aera-event.hpp"
-#include "aera-visualizer-window-base.hpp"
 #include "aera-checkbox.h"
+#include "views/explanation-log.hpp"
 #include "views/semantics.hpp"
+#include "views/player.hpp"
 
 #include <vector>
 #include <QIcon>
 #include <QDockWidget>
+#include <QMainWindow>
+#include <QSettings>
 
 class AeraVisualizerScene;
 
@@ -78,14 +81,16 @@ class QProgressDialog;
 
 namespace aera_visualizer {
 
+// Some views require forward declaration
 class ExplanationLogView;
 class FindDialog;
+class PlayerView;
 
 /**
  * AeraVisualizerWindow extends AeraVisualizerWindowBase to present the player
  * control panel and a window for visualizing the processing of AERA objects.
  */
-class AeraVisualizerWindow : public AeraVisualizerWindowBase
+class AeraVisualizerWindow : public QMainWindow
 {
   Q_OBJECT
 
@@ -193,6 +198,41 @@ public:
     return semanticsView_->getModelsScene();
   }
 
+  void playPauseButtonClickedImpl();
+  void stepButtonClickedImpl();       // Don't call until AERA loaded
+  void stepBackButtonClickedImpl();
+  void playTimeLabelClickedImpl();
+
+  /**
+   * Called by a PlayerView in setSliderToPlayTime
+   */
+  int getNumberOfEvents() {
+    return events_.size();
+  }
+
+  /**
+   * Called by a PlayerView in setSliderToPlayTime
+   */
+  core::Timestamp getTimeOfLastEvent() {
+    return events_.back()->time_;
+  }
+
+  /**
+   * Called by a PlayerView in setSliderToPlayTime
+   */
+  void scrollToTime(Timestamp time) {
+    // If auto scroll is enabled, ensure the new item is visible
+    QSettings settings;
+    if (mainScene_ && settings.value("AutoScroll", Qt::Unchecked).toInt() == Qt::Checked) {
+      mainScene_->scrollToTimestamp(time);
+    }
+  }
+
+  /**
+  * Called by a PlayerView to tick forwards when playing
+  */
+  void timerTick();
+
 protected:
   /**
    * Set iNextStepEvent to the index in events_ of the next event that stepEvent will process.
@@ -243,7 +283,6 @@ private slots:
   void fitAll();
 
 private:
-  friend class AeraVisualizerWindowBase;
   void createDockWidgets();
   void createActions();
   void createMenus();
@@ -268,27 +307,6 @@ private:
   core::Timestamp getTimestamp(const std::smatch& matches, int index = 1);
 
   /**
-   * Enable the play timer to play events and set the playPauseButton_ icon.
-   * If isPlaying_ is already true, do nothing.
-   */
-  void startPlay();
-
-  /**
-   * Disable the play timer, set the playPauseButton_ icon and set isPlaying_ false.
-   */
-  void stopPlay();
-
-  /**
-   * Set playTime_ and update the playTimeLabel_.
-   */
-  void setPlayTime(core::Timestamp time);
-
-  /**
-   * Set the playSlider_ position based on playTime_.
-   */
-  void setSliderToPlayTime();
-
-  /**
    * If the step is already in abaStepIndexes_, get the event index and erase
    * from events_ to the end. Set abaStepIndexes_[step] to the next index in events_.
    * (We need this because the ABA derivation backtracks and repeats steps.)
@@ -298,24 +316,20 @@ private:
 
   // Use these to turn the UI on and off depending on whether anything is currently loaded
   void setUIEnabled(bool enabled);
-
-  void playPauseButtonClickedImpl();
-  void stepButtonClickedImpl();       // Don't call until AERA loaded
-  void stepBackButtonClickedImpl();
-  void playTimeLabelClickedImpl();
-  void timerEvent(QTimerEvent* event) override;
+  
   void closeEvent(QCloseEvent* event) override;
-
-  SemanticsView* semanticsView_;
-  QDockWidget* playerControlView_;
+  
 
   AERA_interface* aera_;
   ReplicodeObjects replicodeObjects_;
 
+  SemanticsView* semanticsView_;
+  PlayerView* playerView_;
+
   AeraVisualizerScene* modelsScene_;
   AeraVisualizerScene* mainScene_;
   AeraVisualizerScene* selectedScene_;
-
+  
   QAction* newInstanceAction_;
   QAction* loadOutputAction_;
   QAction* saveOutputAction_;
@@ -362,10 +376,6 @@ private:
   QColor phasedOutModelColor_;
 
   int lastLine_ = 0;      // The farthest we've read into runtime_out.txt
-  bool showRelativeTime_;
-  core::Timestamp playTime_;
-  int playTimerId_;
-  bool isPlaying_;
   // abaStepIndexes has the index in events_ of the step number. See abaNewStep.
   std::vector<size_t> abaStepIndexes_;
   // The AeraEvent types where stepEvent will create a new AeraGraphicsItem.

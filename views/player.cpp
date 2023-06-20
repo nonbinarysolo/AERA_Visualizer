@@ -4,6 +4,7 @@
 //_/_/ 
 //_/_/ Copyright (c) 2018-2023 Jeff Thompson
 //_/_/ Copyright (c) 2018-2023 Kristinn R. Thorisson
+//_/_/ Copyright (c) 2023 Chloe Schaff
 //_/_/ Copyright (c) 2018-2023 Icelandic Institute for Intelligent Machines
 //_/_/ http://www.iiim.is
 //_/_/
@@ -52,7 +53,7 @@
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 #include <ctime>
-#include "aera-visualizer-window.hpp"
+#include "player.hpp"
 
 #include <QtWidgets>
 
@@ -63,19 +64,17 @@ using namespace r_code;
 
 namespace aera_visualizer {
 
-AeraVisualizerWindowBase::AeraVisualizerWindowBase(AeraVisualizerWindow* mainWindow)
-: QMainWindow(mainWindow),
-  mainWindow_(mainWindow)
+PlayerView::PlayerView(AeraVisualizerWindow* mainWindow)
+: QDockWidget("Timeline", mainWindow),
+  mainWindow_(mainWindow),
+  isPlaying_(false),
+  showRelativeTime_(true),
+  playTime_(seconds(0)),
+  playTimerId_(0)
 {
-  createPlayerControlPanel();
+  // No title bar
+  setTitleBarWidget(new QWidget());
 
-  if (mainWindow_)
-    mainWindow_->children_.push_back(this);
-}
-
-void AeraVisualizerWindowBase::createPlayerControlPanel()
-{
-  QHBoxLayout* playerLayout = new QHBoxLayout();
   playIcon_ = QIcon(":/images/play.png");
   pauseIcon_ = QIcon(":/images/pause.png");
   playPauseButton_ = new QToolButton(this);
@@ -105,62 +104,135 @@ void AeraVisualizerWindowBase::createPlayerControlPanel()
   connect(playTimeLabel_, SIGNAL(clicked()), this, SLOT(playTimeLabelClicked()));
   
   // Put together the player layout
+  QHBoxLayout* playerLayout = new QHBoxLayout();
   playerLayout->addWidget(stepBackButton_);
   playerLayout->addWidget(playPauseButton_);
   playerLayout->addWidget(stepButton_);
   playerLayout->addWidget(playSlider_);
   playerLayout->addWidget(playTimeLabel_);
 
-  playerControlPanel_ = new QWidget();
-  playerControlPanel_->setLayout(playerLayout);
+  // Put everything in a container
+  QWidget* container = new QWidget();
+  container->setObjectName("player_container");
+  container->setLayout(playerLayout);
+  setWidget(container);
 }
 
-void AeraVisualizerWindowBase::playPauseButtonClicked()
+void PlayerView::startPlay()
 {
-  if (mainWindow_)
-    mainWindow_->playPauseButtonClickedImpl();
-  else
-    // This is the main window.
-    ((AeraVisualizerWindow*)this)->playPauseButtonClickedImpl();
+  // Update the state
+  playPauseButton_->setIcon(pauseIcon_);
+  isPlaying_ = true;
+
+  // Start the timer
+  if (playTimerId_ == 0)
+    playTimerId_ = startTimer(AeraVisualizer_playTimerTick.count());
 }
 
-void AeraVisualizerWindowBase::stepButtonClicked()
+void PlayerView::stopPlay()
 {
-  if (mainWindow_)
-    mainWindow_->stepButtonClickedImpl();
-  else
-    // This is the main window.
-    ((AeraVisualizerWindow*)this)->stepButtonClickedImpl();
+  // Update the state
+  playPauseButton_->setIcon(playIcon_);
+  isPlaying_ = false;
+
+  // Stop the timer
+  if (playTimerId_ != 0) {
+    killTimer(playTimerId_);
+    playTimerId_ = 0;
+  }
 }
 
-void AeraVisualizerWindowBase::stepBackButtonClicked()
+void PlayerView::playPauseButtonClicked()
 {
-  if (mainWindow_)
-    mainWindow_->stepBackButtonClickedImpl();
+  if (isPlaying_)
+    stopPlay();
   else
-    // This is the main window.
-    ((AeraVisualizerWindow*)this)->stepBackButtonClickedImpl();
+    startPlay();
 }
 
-void AeraVisualizerWindowBase::playSliderValueChanged(int value)
+void PlayerView::stepButtonClicked()
+{
+  mainWindow_->stepButtonClickedImpl();
+}
+
+void PlayerView::stepBackButtonClicked()
+{
+  mainWindow_->stepBackButtonClickedImpl();
+}
+
+void PlayerView::playSliderValueChanged(int value)
 {
   // TODO: Implement to check if the user moved the slider,
   // stopPlay, update the play time.
 }
 
-void AeraVisualizerWindowBase::playTimeLabelClicked()
+void PlayerView::playTimeLabelClicked()
 {
-  if (mainWindow_)
-    mainWindow_->playTimeLabelClickedImpl();
-  else
-    // This is the main window.
-    ((AeraVisualizerWindow*)this)->playTimeLabelClickedImpl();
+  showRelativeTime_ = !showRelativeTime_;
+  setPlayTime(playTime_);
 }
 
-void AeraVisualizerWindowBase::setPlayerUIEnabled(bool enabled) {
+void PlayerView::setPlayTime(Timestamp time)
+{
+  playTime_ = time;
+
+  uint64 total_us;
+  if (showRelativeTime_)
+    total_us = duration_cast<microseconds>(time - timeReference_).count();
+  else
+    total_us = duration_cast<microseconds>(time.time_since_epoch()).count();
+  uint64 us = total_us % 1000;
+  uint64 ms = total_us / 1000;
+  uint64 s = ms / 1000;
+  ms = ms % 1000;
+
+  char buffer[100];
+  if (showRelativeTime_)
+    sprintf(buffer, "%03ds:%03dms:%03dus", (int)s, (int)ms, (int)us);
+  else {
+    // Get the UTC time.
+    time_t gmtTime = s;
+    struct tm* t = gmtime(&gmtTime);
+    sprintf(buffer, "%04d-%02d-%02d   UTC\n%02d:%02d:%02d:%03d:%03d",
+      t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+      t->tm_hour, t->tm_min, t->tm_sec, (int)ms, (int)us);
+  }
+  playTimeLabel_->setText(buffer);
+}
+
+void PlayerView::setSliderToPlayTime()
+{
+  // If there are no events, fix the slider to the start
+  if (mainWindow_->getNumberOfEvents() == 0) {
+    playSlider_->setValue(0);
+    return;
+  }
+
+  // Figure out how far along the we are
+  auto maximumEventTime = mainWindow_->getTimeOfLastEvent();
+  int value = playSlider_->maximum() *
+    ((double)duration_cast<microseconds>(playTime_ - timeReference_).count() /
+      duration_cast<microseconds>(maximumEventTime - timeReference_).count());
+  playSlider_->setValue(value);
+}
+
+void PlayerView::setUIEnabled(bool enabled) {
   playPauseButton_->setEnabled(enabled);
   stepBackButton_->setEnabled(enabled);
   stepButton_->setEnabled(enabled);
+  playTimeLabel_->setEnabled(enabled);
+}
+
+void PlayerView::timerEvent(QTimerEvent* event)
+{
+  // TODO: Make sure we don't re-enter.
+
+  if (event->timerId() != playTimerId_)
+    // This timer event is not for us.
+    return;
+
+  // Anyone who should respond to timer events goes here
+  mainWindow_->timerTick();
 }
 
 ClickableLabel::ClickableLabel(const QString& text, QWidget* parent, Qt::WindowFlags f)
