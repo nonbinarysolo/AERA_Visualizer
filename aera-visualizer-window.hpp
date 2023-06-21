@@ -198,10 +198,23 @@ public:
     return semanticsView_->getModelsScene();
   }
 
-  void playPauseButtonClickedImpl();
-  void stepButtonClickedImpl();       // Don't call until AERA loaded
-  void stepBackButtonClickedImpl();
-  void playTimeLabelClickedImpl();
+  // Step all the way back to the start
+  core::Timestamp vis_jumpToStart();
+
+  // Step back once
+  core::Timestamp vis_stepBack();
+
+  // Step forwards once
+  core::Timestamp vis_stepFwd();
+
+  // Step all the way to the end
+  core::Timestamp vis_jumpToEnd();
+
+  // Step AERA forwards
+  core::Timestamp aera_stepFwd();
+
+  // Let AERA run all the way to the end
+  core::Timestamp aera_jumpToEnd();
 
   /**
    * Called by a PlayerView in setSliderToPlayTime
@@ -232,6 +245,11 @@ public:
   * Called by a PlayerView to tick forwards when playing
   */
   void timerTick();
+
+  // Get AERA's current time
+  core::Timestamp getAERATime() {
+    return aera_->getCurrentTime();
+  }
 
 protected:
   /**

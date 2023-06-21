@@ -61,6 +61,7 @@
 #include <QToolButton>
 #include <QSlider>
 #include <QLabel>
+#include <QProgressBar>
 #include "../submodules/AERA/r_code/utils.h"
 #include "../replicode-objects.hpp"
 #include "../aera-visualizer-window.hpp"
@@ -109,11 +110,28 @@ public:
     return playTime_;
   }
 
-  //Set playTime_ and update the playTimeLabel_.
-  void setPlayTime(core::Timestamp time);
+  // Return current AERA time
+  core::Timestamp getAERATime() {
+    return aeraTime_;
+  }
+
+  // Set playTime_ and update the playTimeLabel_.
+  void setPlayTime(core::Timestamp time) {
+    playTime_ = time;
+    updateLabels();
+  }
+
+  // Set runTime_ and update the aeraBar_
+  void setRunTime(milliseconds run_time) {
+    runTime_ = run_time;
+    updateAERABar();
+  }
 
   // Set the playSlider_ position based on playTime_.
   void setSliderToPlayTime();
+
+  // Update AERA's progress bar to the current aeraTime_
+  void updateAERABar();
 
   // Setting the time reference from the main window's replicodeObjects_
   void setTimeReference(core::Timestamp timeReference) {
@@ -124,28 +142,44 @@ public:
   void setUIEnabled(bool enabled);
 
 private slots:
-  void playPauseButtonClicked();
-  void stepButtonClicked();
-  void stepBackButtonClicked();
+  void vis_playPauseButtonClicked();
+  void vis_stepFwdButtonClicked();
+  void vis_stepBackButtonClicked();
+  void vis_jumpToStartButtonClicked();
+  void vis_jumpToEndButtonClicked();
+  void aera_playPauseButtonClicked();
+  void aera_stepFwdButtonClicked();
+  void aera_jumpToEndButtonClicked();
   void playSliderValueChanged(int value);
-  void playTimeLabelClicked();
+  void timeLabelClicked();
 
 private:
   void timerEvent(QTimerEvent* event) override;
+
+  void updateLabels();
 
   AeraVisualizerWindow* mainWindow_;
   bool isPlaying_;
   bool showRelativeTime_;
   int playTimerId_;
   core::Timestamp playTime_;
+  core::Timestamp aeraTime_;
   core::Timestamp timeReference_;
+  milliseconds runTime_;
   QIcon playIcon_;
   QIcon pauseIcon_;
+  QToolButton* jumpToEndButton_;
+  QToolButton* jumpToStartButton_;
   QToolButton* playPauseButton_;
   QToolButton* stepBackButton_;
-  QToolButton* stepButton_;
+  QToolButton* stepFwdButton_;
+  QToolButton* aeraStepButton_;
+  QToolButton* aeraPlayPauseButton_;
+  QToolButton* aeraJumpToEndButton_;
   QSlider* playSlider_;
+  QProgressBar* aeraBar_;
   ClickableLabel* playTimeLabel_;
+  ClickableLabel* aeraTimeLabel_;
 };
 
 static const std::chrono::milliseconds AeraVisualizer_playTimerTick(100);
