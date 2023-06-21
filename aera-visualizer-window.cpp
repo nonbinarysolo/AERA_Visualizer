@@ -190,6 +190,7 @@ AeraVisualizerWindow::AeraVisualizerWindow()
   mainSceneView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   mainSceneView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   mainSceneView->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred));
+  
   // Set a default selected scene.
   selectedScene_ = mainScene_;
   
@@ -1673,24 +1674,37 @@ Timestamp AeraVisualizerWindow::unstepEvent(Timestamp minimumTime, bool& foundGr
     return Timestamp(seconds(0));
 }
 
-void AeraVisualizerWindow::stepButtonClickedImpl()
-{
-  // Run AERA a bit more
+core::Timestamp AeraVisualizerWindow::aera_stepFwd() {
+  // Run AERA a bit
   // TO DO: This only works for steps >200ms. Best guess is there's something in the interface between
   //        AERA and the Visualizer that breaks on short steps since AERA seems to do just fine with 
   //        them when run on its own.
-  aera_->runFor(milliseconds(201));
+  aera_->runFor(milliseconds(250));
 
   // Update everything
   updateObjectsAndEvents();
-  
-  playerView_->setPlayTime(replicodeObjects_.getTimeReference());
-  playerView_->setSliderToPlayTime();
 
+  // Return the current time
+  return aera_->getCurrentTime();
+}
+
+core::Timestamp AeraVisualizerWindow::aera_jumpToEnd() {
+  // Run AERA to the end
+  aera_->run();
+
+  // Update everything
+  updateObjectsAndEvents();
+
+  // Return the current time
+  return aera_->getCurrentTime();
+}
+
+core::Timestamp AeraVisualizerWindow::vis_stepFwd()
+{
   playerView_->stopPlay();
   size_t iNextStepEvent;
   if (getINextStepEvent(Utils_MaxTime, iNextEvent_, iNextStepEvent) == Utils_MaxTime)
-    return;
+    return playerView_->getAERATime();
   auto eventTime = events_[iNextStepEvent]->time_;
 
   // Keep stepping remaining events in this same frame.
@@ -1760,17 +1774,16 @@ void AeraVisualizerWindow::stepButtonClickedImpl()
     }
   }
 
-  playerView_->setPlayTime(eventTime);
-  playerView_->setSliderToPlayTime();
+  return eventTime;
 }
 
-void AeraVisualizerWindow::stepBackButtonClickedImpl()
+core::Timestamp AeraVisualizerWindow::vis_stepBack()
 {
   playerView_->stopPlay();
   bool foundGraphicsItem;
   auto newTime = max(unstepEvent(Timestamp(seconds(0)), foundGraphicsItem), replicodeObjects_.getTimeReference());
   if (newTime == Utils_MaxTime)
-    return;
+    return replicodeObjects_.getTimeReference();
   // Debug: How to step the children also?
 
   // Keep unstepping remaining events in this same frame.
@@ -1788,8 +1801,33 @@ void AeraVisualizerWindow::stepBackButtonClickedImpl()
     newTime = localNewTime;
   }
 
-  playerView_->setPlayTime(max(newTime, replicodeObjects_.getTimeReference()));
-  playerView_->setSliderToPlayTime();
+  return max(newTime, replicodeObjects_.getTimeReference());
+}
+
+core::Timestamp AeraVisualizerWindow::vis_jumpToStart() {
+  core::Timestamp startTime = replicodeObjects_.getTimeReference();
+  core::Timestamp playTime = playerView_->getPlayTime();
+
+  // Step until the beginning
+  while (playTime > startTime)
+    playTime = vis_stepBack();
+
+  return playTime;
+}
+
+core::Timestamp AeraVisualizerWindow::vis_jumpToEnd() {
+  core::Timestamp endTime = playerView_->getAERATime();
+  core::Timestamp playTime = playerView_->getPlayTime();
+
+  setCursor(QCursor(Qt::BusyCursor)); // This may take a minute
+
+  // Step until the end
+  while (playTime < endTime)
+    playTime = vis_stepFwd();
+
+  setCursor(QCursor(Qt::ArrowCursor)); // Back to normal
+
+  return playTime;
 }
 
 void AeraVisualizerWindow::timerTick() {
@@ -1813,7 +1851,6 @@ void AeraVisualizerWindow::timerTick() {
   }
 
   playerView_->setPlayTime(playTime);
-  playerView_->setSliderToPlayTime();
 }
 
 void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
@@ -1908,6 +1945,8 @@ void AeraVisualizerWindow::updateObjectsAndEvents()
   explanationLogView_->setReplicodeObjects(&replicodeObjects_);
   semanticsView_->setReplicodeObjects(&replicodeObjects_);
   playerView_->setTimeReference(replicodeObjects_.getTimeReference());
+  playerView_->setRunTime(milliseconds(settings.run_time_));
+  playerView_->setPlayTime(replicodeObjects_.getTimeReference());
   findDialog_->setReplicodeObjects(&replicodeObjects_);
   mainScene_->setReplicodeObjects(&replicodeObjects_);
 
