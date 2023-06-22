@@ -189,7 +189,6 @@ AeraVisualizerWindow::AeraVisualizerWindow()
   auto mainSceneView = new MyQGraphicsView(mainScene_, this);
   mainSceneView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   mainSceneView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  mainSceneView->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred));
   
   // Set a default selected scene.
   selectedScene_ = mainScene_;
@@ -206,6 +205,11 @@ AeraVisualizerWindow::AeraVisualizerWindow()
 
   setWindowTitle(tr("AERA Visualizer"));
   setUnifiedTitleAndToolBarOnMac(true);
+
+  // Reset the widgets to the way they were last time
+  QSettings preferences;
+  restoreGeometry(preferences.value("geometry").toByteArray());
+  restoreState(preferences.value("state").toByteArray());
 
   // Turn everything off until something's loaded in
   setUIEnabled(false);
@@ -1855,6 +1859,12 @@ void AeraVisualizerWindow::timerTick() {
 
 void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
   findDialog_->close();
+  
+  // Save current state for next time
+  QSettings preferences;
+  preferences.setValue("geometry", saveGeometry());
+  preferences.setValue("state", saveState());
+  
   event->accept();
 }
 
@@ -2025,6 +2035,7 @@ void AeraVisualizerWindow::createDockWidgets() {
   
   // Set up the explanation log
   explanationLogView_ = new ExplanationLogView(this);
+  semanticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
   addDockWidget(Qt::RightDockWidgetArea, explanationLogView_);
 
   // Make the player a fixed dock widget so it's always at the bottom of the window
