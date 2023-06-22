@@ -1790,6 +1790,9 @@ core::Timestamp AeraVisualizerWindow::vis_stepFwd()
     }
   }
 
+  // Scroll to the current time
+  scrollToTime(eventTime);
+
   return eventTime;
 }
 
@@ -1817,6 +1820,9 @@ core::Timestamp AeraVisualizerWindow::vis_stepBack()
     newTime = localNewTime;
   }
 
+  // Scroll to the current time
+  scrollToTime(max(newTime, replicodeObjects_.getTimeReference()));
+
   return max(newTime, replicodeObjects_.getTimeReference());
 }
 
@@ -1827,6 +1833,9 @@ core::Timestamp AeraVisualizerWindow::vis_jumpToStart() {
   // Step until the beginning
   while (playTime > startTime)
     playTime = vis_stepBack();
+
+  // Scroll to the current time
+  scrollToTime(playTime);
 
   return playTime;
 }
@@ -1842,6 +1851,9 @@ core::Timestamp AeraVisualizerWindow::vis_jumpToEnd() {
     playTime = vis_stepFwd();
 
   setCursor(QCursor(Qt::ArrowCursor)); // Back to normal
+
+  // Scroll to the current time
+  scrollToTime(playTime);
 
   return playTime;
 }
@@ -1867,6 +1879,7 @@ void AeraVisualizerWindow::timerTick() {
   }
 
   playerView_->setPlayTime(playTime);
+  scrollToTime(playTime);
 }
 
 void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
