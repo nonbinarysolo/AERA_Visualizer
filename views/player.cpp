@@ -252,7 +252,6 @@ void PlayerView::aera_jumpToEndButtonClicked() {
   aeraTime_ = mainWindow_->aera_jumpToEnd();
 
   // Update the display
-  //aeraTime_ = mainWindow_->getAERATime();
   updateAERABar();
   updateLabels();
 
