@@ -65,6 +65,8 @@
 * be with the mainWindow_, but it's also okay for views to talk directly
 * to eachother where relevant. See createDockWidgets() in
 * aera-visualizer-window.cpp as an example of how to add this to the window.
+* Remember to add a class VIEWNAME statement to main.cpp since views will
+* give weird errors if not forwardly-declared.
 */
 
 namespace aera_visualizer {
