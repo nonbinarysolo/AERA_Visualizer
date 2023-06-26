@@ -327,6 +327,9 @@
     <ClCompile Include="template.cpp">
       <Filter>views</Filter>
     </ClCompile>
+    <ClCompile Include="views\text-output.cpp">
+      <Filter>views</Filter>
+    </ClCompile>
     <ClCompile Include="graphics-items\reduction-marker-item.cpp">
       <Filter>graphics-items</Filter>
     </ClCompile>
@@ -734,6 +737,9 @@
       <Filter>views</Filter>
     </QtMoc>
     <QtMoc Include="template.hpp">
+      <Filter>views</Filter>
+    </QtMoc>
+    <QtMoc Include="views\text-output.hpp">
       <Filter>views</Filter>
     </QtMoc>
   </ItemGroup>
