@@ -62,6 +62,7 @@
 #include "views/explanation-log.hpp"
 #include "views/semantics.hpp"
 #include "views/player.hpp"
+#include "views/text-output.hpp"
 
 #include <vector>
 #include <QIcon>
@@ -85,6 +86,7 @@ namespace aera_visualizer {
 class ExplanationLogView;
 class FindDialog;
 class PlayerView;
+class TextOutputView;
 
 /**
  * AeraVisualizerWindow extends AeraVisualizerWindowBase to present the player
@@ -343,6 +345,7 @@ private:
 
   SemanticsView* semanticsView_;
   PlayerView* playerView_;
+  TextOutputView* textOutputView_;
 
   AeraVisualizerScene* modelsScene_;
   AeraVisualizerScene* mainScene_;

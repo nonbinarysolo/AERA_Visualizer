@@ -89,6 +89,7 @@
 #include "views/explanation-log.hpp"
 #include "views/semantics.hpp"
 #include "views/player.hpp"
+#include "views/text-output.hpp"
 
 #include <QtWidgets>
 #include <QProgressDialog>
@@ -1923,6 +1924,9 @@ void AeraVisualizerWindow::loadNewSeed()
     }
   }
 
+  // Send this to the text output so it can read in the outputs
+  textOutputView_->setOutputFilepaths(settings.decompilation_file_path_, settings.runtime_output_file_path_);
+
   // This version isn't resettable just yet
   newInstanceAction_->setEnabled(false);
   loadOutputAction_->setEnabled(false);
@@ -1972,6 +1976,10 @@ void AeraVisualizerWindow::updateObjectsAndEvents()
   playerView_->setPlayTime(replicodeObjects_.getTimeReference());
   findDialog_->setReplicodeObjects(&replicodeObjects_);
   mainScene_->setReplicodeObjects(&replicodeObjects_);
+
+  // Some views require the text outputs
+  aera_->brainDump();
+  textOutputView_->refresh();
 
   // Clean up
   progress.close();
@@ -2060,6 +2068,11 @@ void AeraVisualizerWindow::createDockWidgets() {
   explanationLogView_ = new ExplanationLogView(this);
   semanticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
   addDockWidget(Qt::RightDockWidgetArea, explanationLogView_);
+
+  // Set up the text view
+  textOutputView_ = new TextOutputView(this);
+  textOutputView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  addDockWidget(Qt::RightDockWidgetArea, textOutputView_);
 
   // Make the player a fixed dock widget so it's always at the bottom of the window
   playerView_ = new PlayerView(this);
@@ -2152,10 +2165,11 @@ void AeraVisualizerWindow::createMenus()
   AERAMenu->addAction(resetAERAInstanceAction_);
   AERAMenu->addAction(configureAERAInstanceAction_);
 
-  QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
+  QMenu* viewMenu = menuBar()->addMenu(tr("&Views"));
   viewMenu->addAction(findAction_);
   viewMenu->addAction(explanationLogView_->toggleViewAction());
   viewMenu->addAction(semanticsView_->toggleViewAction());
+  viewMenu->addAction(textOutputView_->toggleViewAction());
 
   QMenu* findMenu = menuBar()->addMenu(tr("Fin&d"));
   findMenu->addAction(findAction_);
