@@ -1812,6 +1812,10 @@ core::Timestamp AeraVisualizerWindow::vis_stepBack()
 }
 
 core::Timestamp AeraVisualizerWindow::vis_jumpToStart() {
+  // This only works if we have a time reference to jump to
+  if (!replicodeObjects_.initialized())
+    return playerView_->getPlayTime();
+
   core::Timestamp startTime = replicodeObjects_.getTimeReference();
   core::Timestamp playTime = playerView_->getPlayTime();
 
@@ -1826,6 +1830,10 @@ core::Timestamp AeraVisualizerWindow::vis_jumpToStart() {
 }
 
 core::Timestamp AeraVisualizerWindow::vis_jumpToEnd() {
+  // This only works if we have a time reference to jump to
+  if (!replicodeObjects_.initialized())
+    return playerView_->getPlayTime();
+
   core::Timestamp endTime = playerView_->getAERATime();
   core::Timestamp playTime = playerView_->getPlayTime();
 
@@ -1923,6 +1931,10 @@ void AeraVisualizerWindow::loadNewSeed()
       return;
     }
   }
+
+  // Create replicodeObjects_ but don't initialize it
+  replicodeObjects_ = ReplicodeObjects();
+  findDialog_->setReplicodeObjects(&replicodeObjects_);
 
   // Send this to the text output so it can read in the outputs
   textOutputView_->setOutputFilepaths(settings.decompilation_file_path_, settings.runtime_output_file_path_);
