@@ -1879,7 +1879,9 @@ void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
 }
 
 void AeraVisualizerWindow::loadNewSeed()
-{
+{ // TO DO: This is temporarily disabled until the user can select seed programs directly.
+  //        For that to work, we'll need to finish the work on the settings-GUI branch
+  /*
   // Try and retrieve the last settings file loaded (fall back to the local one)
   QSettings preferences;
   QString settingsFilePath0 = preferences.value("settingsFilePath").toString();
@@ -1893,6 +1895,8 @@ void AeraVisualizerWindow::loadNewSeed()
     return;
   else
     preferences.setValue("settingsFilePath", settingsFilePath);
+    */
+  QString settingsFilePath = "settings.xml";
 
   // Load the settings
   Settings settings;
@@ -2092,9 +2096,12 @@ void AeraVisualizerWindow::createDockWidgets() {
 
 void AeraVisualizerWindow::createActions()
 {
-  newInstanceAction_ = new QAction(tr("&Load new settings.xml"), this);
+  // TO DO: This should allow the user to select a seed .replicode file
+  //newInstanceAction_ = new QAction(tr("&Load seed program"), this);
+  newInstanceAction_ = new QAction(tr("&Start AERA"), this);
   newInstanceAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-  newInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+  //newInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+  newInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
   connect(newInstanceAction_, SIGNAL(triggered()), this, SLOT(loadNewSeed()));
 
   loadOutputAction_ = new QAction(tr("&Open AERA Output"), this);
