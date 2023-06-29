@@ -348,7 +348,7 @@ private:
   SemanticsView* semanticsView_;
   PlayerView* playerView_;
   TextOutputView* textOutputView_;
-  TaskEnvironmentView* internalEnvView_;
+  TaskEnvironmentView* taskEnvironmentView_;
 
   AeraVisualizerScene* modelsScene_;
   AeraVisualizerScene* mainScene_;

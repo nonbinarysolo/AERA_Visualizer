@@ -87,10 +87,6 @@
 
 #include "aera-visualizer-window.hpp"
 #include "find-dialog.hpp"
-#include "views/explanation-log.hpp"
-#include "views/semantics.hpp"
-#include "views/player.hpp"
-#include "views/text-output.hpp"
 
 #include <QtWidgets>
 #include <QProgressDialog>
@@ -1940,7 +1936,7 @@ void AeraVisualizerWindow::loadNewSeed()
   textOutputView_->setOutputFilepaths(settings.decompilation_file_path_, settings.runtime_output_file_path_);
 
   // Update internal environment view with a link to AERA so it can access TestMem
-  internalEnvView_->setAERA(aera_);
+  taskEnvironmentView_->setAERA(aera_);
 
   // This version isn't resettable just yet
   newInstanceAction_->setEnabled(false);
@@ -1991,7 +1987,7 @@ void AeraVisualizerWindow::updateObjectsAndEvents()
   playerView_->setPlayTime(replicodeObjects_.getTimeReference());
   findDialog_->setReplicodeObjects(&replicodeObjects_);
   mainScene_->setReplicodeObjects(&replicodeObjects_);
-  internalEnvView_->refresh();
+  taskEnvironmentView_->refresh();
 
   // Some views require the text outputs
   aera_->brainDump();
@@ -2078,26 +2074,31 @@ void AeraVisualizerWindow::createDockWidgets() {
   // Set up the semantics view
   semanticsView_ = new SemanticsView(this);
   semanticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  semanticsView_->setObjectName("SemanticsView");
   addDockWidget(Qt::LeftDockWidgetArea, semanticsView_);
   
   // Set up the explanation log
   explanationLogView_ = new ExplanationLogView(this);
-  semanticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  explanationLogView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  explanationLogView_->setObjectName("ExplanationLog");
   addDockWidget(Qt::RightDockWidgetArea, explanationLogView_);
 
   // Set up the text view
   textOutputView_ = new TextOutputView(this);
   textOutputView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  textOutputView_->setObjectName("TextOutputView");
   addDockWidget(Qt::RightDockWidgetArea, textOutputView_);
 
   // Set up the internal environment view
-  internalEnvView_ = new TaskEnvironmentView(this);
-  internalEnvView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
-  addDockWidget(Qt::LeftDockWidgetArea, internalEnvView_);
+  taskEnvironmentView_ = new TaskEnvironmentView(this);
+  taskEnvironmentView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  taskEnvironmentView_->setObjectName("TaskEnvironmentView");
+  addDockWidget(Qt::LeftDockWidgetArea, taskEnvironmentView_);
 
   // Make the player a fixed dock widget so it's always at the bottom of the window
   playerView_ = new PlayerView(this);
   playerView_->setFeatures(QDockWidget::NoDockWidgetFeatures);
+  playerView_->setObjectName("PlayerView");
   addDockWidget(Qt::BottomDockWidgetArea, playerView_);
 }
 
@@ -2178,20 +2179,21 @@ void AeraVisualizerWindow::createMenus()
 
   QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
   fileMenu->addAction(newInstanceAction_);
-  fileMenu->addAction(loadOutputAction_);
+  //fileMenu->addAction(loadOutputAction_); // Leave this out until it's implemented properly
   fileMenu->addAction(saveOutputAction_);
   fileMenu->addAction(exitAction_);
 
-  QMenu* AERAMenu = menuBar()->addMenu(tr("&AERA"));
-  AERAMenu->addAction(resetAERAInstanceAction_);
-  AERAMenu->addAction(configureAERAInstanceAction_);
+  // These are turned off until they're fully implemented
+  //QMenu* AERAMenu = menuBar()->addMenu(tr("&AERA"));
+  //AERAMenu->addAction(resetAERAInstanceAction_);
+  //AERAMenu->addAction(configureAERAInstanceAction_);
 
   QMenu* viewMenu = menuBar()->addMenu(tr("&Views"));
   viewMenu->addAction(findAction_);
   viewMenu->addAction(explanationLogView_->toggleViewAction());
   viewMenu->addAction(semanticsView_->toggleViewAction());
   viewMenu->addAction(textOutputView_->toggleViewAction());
-  viewMenu->addAction(internalEnvView_->toggleViewAction());
+  viewMenu->addAction(taskEnvironmentView_->toggleViewAction());
 
   QMenu* findMenu = menuBar()->addMenu(tr("Fin&d"));
   findMenu->addAction(findAction_);
