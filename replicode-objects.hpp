@@ -156,6 +156,10 @@ public:
     // Put matches here
     std::vector<std::string> matches;
 
+    // Skip over this if we're not loaded yet
+    if (!initialized_)
+      return matches;
+
     // Record all labels that contain searchString as a substring
     for (std::pair<std::string, r_code::Code*> pair : labelObject_) {
       if (pair.first.find(searchString) != std::string::npos)
@@ -205,6 +209,11 @@ public:
    */
   bool getObjects(std::string oids, std::vector<r_code::Code*>& objects);
 
+  // Return whether the object has been initialized
+  bool initialized() {
+    return initialized_;
+  }
+
 private:
   /**
    * Process the decompiled objects file to remove OIDs, detail OIDs and info lines starting with ">".
@@ -219,6 +228,8 @@ private:
   std::string processDecompiledObjects(
     std::string decompiledFilePath, std::map<std::string, core::uint32>& objectOids,
     std::map<std::string, core::uint64>& objectDetailOids);
+
+  bool initialized_ = false;
 
   std::chrono::microseconds basePeriod_;
   core::Timestamp timeReference_;

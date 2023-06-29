@@ -87,6 +87,8 @@ ReplicodeObjects::ReplicodeObjects()
   progressMessages_.push_back("Postprocessing code");
   progressMessages_.push_back("Reading runtime output");
   progressMessages_.push_back("Setting up workspace");
+
+  initialized_ = false;
 }
 
 string ReplicodeObjects::init(const string& userClassesFilePath, const string& decompiledFilePath,
@@ -286,6 +288,9 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
     }
   }
 
+  // Mark that initialization is complete
+  initialized_ = true;
+
   return "";
 }
 
@@ -450,6 +455,9 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
       objectSourceCode_[object] = source;
     }
   }
+
+  // Mark that initialization is complete
+  initialized_ = true;
   
   return "";
 }
