@@ -85,10 +85,11 @@ namespace aera_visualizer {
 
 // Some views require forward declaration
 class ExplanationLogView;
-class FindDialog;
 class PlayerView;
 class TextOutputView;
 class InternalEnvView;
+class FindDialog;
+class SettingsDialog;
 
 /**
  * AeraVisualizerWindow extends AeraVisualizerWindowBase to present the player
@@ -125,6 +126,11 @@ public:
   void setFindWindow(FindDialog* zoomToWindow)
   {
     findDialog_ = zoomToWindow;
+  }
+
+  void setSettingsWindow(SettingsDialog* settingsDialog)
+  {
+    settingsDialog_ = settingsDialog;
   }
   
   // Modify some code from stepEvent so we can compute the current maximum visible time
@@ -291,6 +297,7 @@ protected:
 
   ExplanationLogView* explanationLogView_;
   FindDialog* findDialog_;
+  SettingsDialog* settingsDialog_;
 
 private slots:
   void loadNewSeed();
@@ -303,6 +310,7 @@ private slots:
   void findNext();
   void findPrev();
   void fitAll();
+  void configureAERA();
 
 private:
   void createDockWidgets();

@@ -86,6 +86,7 @@
 
 #include "aera-visualizer-window.hpp"
 #include "find-dialog.hpp"
+#include "settings-dialog.hpp"
 #include "views/explanation-log.hpp"
 #include "views/semantics.hpp"
 #include "views/player.hpp"
@@ -1933,6 +1934,7 @@ void AeraVisualizerWindow::loadNewSeed()
   // This version isn't resettable just yet
   newInstanceAction_->setEnabled(false);
   loadOutputAction_->setEnabled(false);
+  configureAERAInstanceAction_->setEnabled(false);
 
   // Enable the UI now that there's something to analyze
   setUIEnabled(true);
@@ -2058,6 +2060,13 @@ void AeraVisualizerWindow::fitAll() {
   return;
 }
 
+void AeraVisualizerWindow::configureAERA()
+{
+  // Create a new settings dialog each time
+  settingsDialog_ = new SettingsDialog(this);
+  settingsDialog_->open();
+}
+
 void AeraVisualizerWindow::createDockWidgets() {
   // Configure docking settings
   setDockNestingEnabled(true);
@@ -2120,8 +2129,8 @@ void AeraVisualizerWindow::createActions()
 
   configureAERAInstanceAction_ = new QAction(tr("&Configure AERA Instance"), this);
   configureAERAInstanceAction_->setIcon(style()->standardIcon(QStyle::SP_FileDialogInfoView));
-  configureAERAInstanceAction_->setEnabled(false);
-  //connect(configureAERAInstanceAction_, SIGNAL(triggered()), this, SLOT(close()));
+  configureAERAInstanceAction_->setEnabled(true);
+  connect(configureAERAInstanceAction_, SIGNAL(triggered()), this, SLOT(configureAERA()));
 
   zoomInAction_ = new QAction(QIcon(":/images/zoom-in.png"), tr("Zoom In"), this);
   zoomInAction_->setStatusTip(tr("Zoom In"));
@@ -2280,8 +2289,7 @@ void AeraVisualizerWindow::createToolbars()
 void AeraVisualizerWindow::setUIEnabled(bool enabled) {
   // Actions
   saveOutputAction_->setEnabled(enabled);
-  resetAERAInstanceAction_->setEnabled(enabled);
-  configureAERAInstanceAction_->setEnabled(enabled);
+  resetAERAInstanceAction_->setEnabled(false);
   zoomInAction_->setEnabled(enabled);
   zoomOutAction_->setEnabled(enabled);
   zoomHomeAction_->setEnabled(enabled);

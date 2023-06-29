@@ -55,6 +55,7 @@
 #include "aera-visualizer-window.hpp"
 #include "views/explanation-log.hpp"
 #include "find-dialog.hpp"
+#include "settings-dialog.hpp"
 #include "submodules/AERA/AERA/settings.h"
 #include "submodules/AERA/AERA/main.h"
 
@@ -133,8 +134,13 @@ int main(int argv, char *args[])
   // Set up the Find dialog but don't display it
   auto findDialog = new FindDialog(&mainWindow);
   mainWindow.setFindWindow(findDialog);
+
+  // Do the same for the settings dialog
+  auto settingsDialog = new SettingsDialog(&mainWindow);
+  mainWindow.setSettingsWindow(settingsDialog);
+
+  // Start everything up
   mainWindow.show();
   mainWindow.addStartupItems();
-
   return app.exec();
 }

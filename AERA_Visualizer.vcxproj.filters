@@ -333,6 +333,7 @@
     <ClCompile Include="views\internal-env.cpp">
       <Filter>views</Filter>
     </ClCompile>
+    <ClCompile Include="settings-dialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aera-event.hpp" />
@@ -742,6 +743,7 @@
     <QtMoc Include="views\internal-env.hpp">
       <Filter>views</Filter>
     </QtMoc>
+    <QtMoc Include="settings-dialog.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="submodules\AERA\r_exec\r_exec.vcxproj">
