@@ -2079,7 +2079,7 @@ void AeraVisualizerWindow::createDockWidgets() {
   addDockWidget(Qt::RightDockWidgetArea, textOutputView_);
 
   // Set up the internal environment view
-  internalEnvView_ = new InternalEnvView(this);
+  internalEnvView_ = new TaskEnvironmentView(this);
   internalEnvView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
   addDockWidget(Qt::LeftDockWidgetArea, internalEnvView_);
 
