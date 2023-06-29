@@ -60,17 +60,7 @@
 
 #include "../aera-visualizer-window.hpp"
 #include "../replicode-objects.hpp"
-//#include "../submodules/AERA/AERA/test_mem.h"
 
-/* This file can be used as a template for creating new views for
-* the visualizer. Each view extends a QDockWidget so it can be dragged
-* around and reconfigured by the user. Most of its communication should
-* be with the mainWindow_, but it's also okay for views to talk directly
-* to eachother where relevant. See createDockWidgets() in
-* aera-visualizer-window.cpp as an example of how to add this to the window.
-* Remember to add a class VIEWNAME statement to main.cpp since views will
-* give weird errors if not forwardly-declared.
-*/
 
 using namespace std;
 
@@ -123,21 +113,22 @@ private:
 
 
 /**
-* InternalEnvView extends QDockWidget to allow the user to
+* TaskEnvironmentView extends QDockWidget to allow the user to
 * rearrange it as needed. It shows a graphical representation of
-* the current status of a program in test_mem. Only select
-* test environments are supported
+* the current status of a program in test_mem, Webots, or any
+* other environment AERA may be working in. For now, only select
+* test_mem environments are supported
 */
-class InternalEnvView : public QDockWidget
+class TaskEnvironmentView : public QDockWidget
 {
 	Q_OBJECT
 
 public:
 	/**
-		* Create an InternalEnvView.
+		* Create an TaskEnvironmentView.
 		* \param mainWindow The main parent window for this window.
 		*/
-	InternalEnvView(AeraVisualizerWindow* mainWindow);
+	TaskEnvironmentView(AeraVisualizerWindow* mainWindow);
 
 	// Called when there's an update to draw
 	void refresh();

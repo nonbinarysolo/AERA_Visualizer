@@ -330,7 +330,7 @@
     <ClCompile Include="views\text-output.cpp">
       <Filter>views</Filter>
     </ClCompile>
-    <ClCompile Include="views\internal-env.cpp">
+    <ClCompile Include="views\task-environment.cpp">
       <Filter>views</Filter>
     </ClCompile>
     <ClCompile Include="graphics-items\reduction-marker-item.cpp">
@@ -745,7 +745,7 @@
     <QtMoc Include="views\text-output.hpp">
       <Filter>views</Filter>
     </QtMoc>
-    <QtMoc Include="views\internal-env.hpp">
+    <QtMoc Include="views\task-environment.hpp">
       <Filter>views</Filter>
     </QtMoc>
   </ItemGroup>

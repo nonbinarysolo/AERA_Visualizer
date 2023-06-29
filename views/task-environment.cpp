@@ -52,7 +52,7 @@
 //_/_/ 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-#include "internal-env.hpp"
+#include "task-environment.hpp"
 
 #include <QPainter>
 #include <QPainterPath>
@@ -65,7 +65,7 @@ using namespace std::chrono;
 
 namespace aera_visualizer {
 
-	InternalEnvView::InternalEnvView(AeraVisualizerWindow* mainWindow)
+	TaskEnvironmentView::TaskEnvironmentView(AeraVisualizerWindow* mainWindow)
 		: QDockWidget("Task-Environment", mainWindow),
 		positionY_(0),
 		velocityY_(0),
@@ -113,7 +113,7 @@ namespace aera_visualizer {
 		setWidget(container);
 	}
 
-	void InternalEnvView::setAERA(AERA_interface* aera) {
+	void TaskEnvironmentView::setAERA(AERA_interface* aera) {
 		// Get the updated information
 		aera_ = aera;
 
@@ -121,7 +121,7 @@ namespace aera_visualizer {
 		refresh();
 	}
 
-	void InternalEnvView::refresh() {
+	void TaskEnvironmentView::refresh() {
 		identifier_ = aera_->getMem()->getIdentifier();
 
 		// Use identifier_ to decide what to show
