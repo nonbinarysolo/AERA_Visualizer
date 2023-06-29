@@ -63,7 +63,7 @@
 namespace aera_visualizer {
 
 	TextOutputView::TextOutputView(AeraVisualizerWindow* mainWindow)
-		: QDockWidget("AERA Output View", mainWindow)
+		: QDockWidget("Raw Data", mainWindow)
 	{
 
 		// Set up the browsers

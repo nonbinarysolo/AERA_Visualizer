@@ -66,7 +66,7 @@
 namespace aera_visualizer {
 
 SemanticsView::SemanticsView(AeraVisualizerWindow* mainWindow)
-	: QDockWidget("Semantics View", mainWindow)
+	: QDockWidget("Models and Composite States", mainWindow)
 {
 	QWidget* container = new QWidget();
 	container->setObjectName("semantics_container");

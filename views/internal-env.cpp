@@ -66,7 +66,7 @@ using namespace std::chrono;
 namespace aera_visualizer {
 
 	InternalEnvView::InternalEnvView(AeraVisualizerWindow* mainWindow)
-		: QDockWidget("Internal Environment", mainWindow),
+		: QDockWidget("Task-Environment", mainWindow),
 		positionY_(0),
 		velocityY_(0),
 		forceY_(0)
