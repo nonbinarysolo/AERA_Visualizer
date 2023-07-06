@@ -202,7 +202,7 @@ AeraVisualizerWindow::AeraVisualizerWindow()
   centralWidget->setLayout(centralLayout);
   setCentralWidget(centralWidget);
 
-  setWindowTitle(tr("AERA Visualizer"));
+  setWindowTitle(tr("AERA Visualizer (EXPERIMENTAL)"));
   setUnifiedTitleAndToolBarOnMac(true);
 
   // Reset the widgets to the way they were last time
@@ -1926,7 +1926,7 @@ void AeraVisualizerWindow::loadNewSeed()
   }
 
   // Put the filename in the title
-  setWindowTitle(QString("AERA Visualizer - ") + QFileInfo(settings.source_file_name_.c_str()).fileName());
+  setWindowTitle(QString("AERA Visualizer (EXPERIMENTAL) - ") + QFileInfo(settings.source_file_name_.c_str()).fileName());
 
   // Reset AERA
   aera_ = new AERA_interface(settingsFilePath.toStdString().c_str(), "");
