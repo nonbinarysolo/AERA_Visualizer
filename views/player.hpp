@@ -138,6 +138,9 @@ public:
     timeReference_ = timeReference;
   }
 
+  // Show a busy bar while AERA runs. Reset with updateAERABar()
+  void setAERARunning();
+
   // Used to turn the player controls on or off
   void setUIEnabled(bool enabled);
 
@@ -180,6 +183,8 @@ private:
   QProgressBar* aeraBar_;
   ClickableLabel* playTimeLabel_;
   ClickableLabel* aeraTimeLabel_;
+
+  int aeraBarSize = 2000;   // Big number for fine graduations
 };
 
 static const std::chrono::milliseconds AeraVisualizer_playTimerTick(100);

@@ -1676,6 +1676,10 @@ Timestamp AeraVisualizerWindow::unstepEvent(Timestamp minimumTime, bool& foundGr
 }
 
 core::Timestamp AeraVisualizerWindow::aera_stepFwd() {
+  // Indicate that AERA's running
+  playerView_->setAERARunning();
+  setCursor(QCursor(Qt::BusyCursor)); // This may take a minute
+
   // Run AERA a bit
   // TO DO: This only works for steps >200ms. Best guess is there's something in the interface between
   //        AERA and the Visualizer that breaks on short steps since AERA seems to do just fine with 
@@ -1684,17 +1688,23 @@ core::Timestamp AeraVisualizerWindow::aera_stepFwd() {
 
   // Update everything
   updateObjectsAndEvents();
+  setCursor(QCursor(Qt::ArrowCursor)); // Back to normal
 
   // Return the current time
   return aera_->getCurrentTime();
 }
 
 core::Timestamp AeraVisualizerWindow::aera_jumpToEnd() {
+  // Indicate that AERA's running
+  playerView_->setAERARunning();
+  setCursor(QCursor(Qt::BusyCursor)); // This may take a minute
+
   // Run AERA to the end
   aera_->run();
 
   // Update everything
   updateObjectsAndEvents();
+  setCursor(QCursor(Qt::ArrowCursor)); // Back to normal
 
   // Return the current time
   return aera_->getCurrentTime();
@@ -1877,6 +1887,9 @@ void AeraVisualizerWindow::timerTick() {
 
 void AeraVisualizerWindow::closeEvent(QCloseEvent* event) {
   findDialog_->close();
+
+  // Shut down AERA when we're done
+  aera_->stop();
   
   // Save current state for next time
   QSettings preferences;
@@ -1916,9 +1929,29 @@ void AeraVisualizerWindow::loadNewSeed()
   // Put the filename in the title
   setWindowTitle(QString("AERA Visualizer (EXPERIMENTAL) - ") + QFileInfo(settings.source_file_name_.c_str()).fileName());
 
+  // Show a dialog while AERA starts (it may hang a bit on the TCP I/O device)
+  QProgressDialog progress(this);
+  progress.setWindowTitle("Please wait");
+  progress.setWindowIcon(QIcon(":/images/app.ico"));
+  progress.setMinimum(0);
+  progress.setMaximum(100);
+
+  if (settings.io_device_ == "tcp_io_device") {
+    progress.setWindowTitle("Standing by");
+    progress.setLabelText("Waiting for a TCP connection, please start external program...");
+  }
+  else
+    progress.setLabelText("Starting AERA, please wait...");
+
+  progress.show();
+  QApplication::processEvents();
+
   // Reset AERA
   aera_ = new AERA_interface(settingsFilePath.toStdString().c_str(), "");
   
+  // Clear the progress dialog
+  progress.setValue(100);
+    
   // Files are relative to the directory of settingsFilePath.
   QDir settingsFileDir = QFileInfo(settingsFilePath).dir();
   string runtimeOutputFilePath = settingsFileDir.absoluteFilePath(settings.runtime_output_file_path_.c_str()).toStdString();
