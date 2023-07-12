@@ -74,22 +74,6 @@ using namespace std;
 using namespace std::chrono;
 using namespace aera_visualizer;
 
-/* To Do
-To Implement
-- Clicking "Focus On", etc. buttons should open relevant view
-- Dockable widgets need padding for mainwindow borders
-- Docked tabs should be at the top of the view
-- Reorganize references to semantics view's modelsScene_, it should be more self-contained
-
-Issues
-- Main and model scene widths need to be more flexible
-  - Especially when window not maximized
-- Width setting should be proportional to window size, not absolute
-
-Crashes
-- 
-
-*/
 
 int main(int argv, char *args[])
 {

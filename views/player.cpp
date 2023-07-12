@@ -115,7 +115,7 @@ PlayerView::PlayerView(AeraVisualizerWindow* mainWindow)
 
   // Set up the slider
   playSlider_ = new QSlider(Qt::Horizontal, this);
-  playSlider_->setMaximum(2000);      // Big number for fine graduations
+  playSlider_->setMaximum(aeraBarSize);
   // Until we implement playSliderValueChanged, disable the slider so the user can't drag it.
   // See https://github.com/IIIM-IS/AERA_Visualizer/issues/3 .
   playSlider_->setEnabled(false);
@@ -231,7 +231,8 @@ void PlayerView::vis_jumpToEndButtonClicked()
 }
 
 void PlayerView::aera_playPauseButtonClicked() {
-  // AERA should run live
+  // AERA should run live. This will be like the jump to end button
+  // but it will run open-ended, not just to the end of settings.run_time
 }
 
 void PlayerView::aera_stepFwdButtonClicked() {
@@ -345,6 +346,8 @@ void PlayerView::setSliderToPlayTime()
 
 
 void PlayerView::updateAERABar() {
+  aeraBar_->setMaximum(aeraBarSize); // Reset this in case we were in setAERARunning before
+
   // Figure out how far along we are
   auto endTime = timeReference_ + runTime_;
   int value = aeraBar_->maximum() *
@@ -381,6 +384,11 @@ void PlayerView::timerEvent(QTimerEvent* event)
 
   // Keep the UI updated
   setSliderToPlayTime();
+}
+
+void PlayerView::setAERARunning() {
+  aeraBar_->setMaximum(0);
+  aeraBar_->setValue(0);
 }
 
 ClickableLabel::ClickableLabel(const QString& text, QWidget* parent, Qt::WindowFlags f)
