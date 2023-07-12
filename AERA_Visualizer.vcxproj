@@ -121,7 +121,6 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -190,7 +189,6 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -257,7 +255,12 @@
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.cpp" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen.cpp" />
     <ClCompile Include="submodules\AERA\AERA\IODevices\video_screen\video_screen_io_device.cpp" />
-    <ClCompile Include="submodules\AERA\AERA\main.cpp" />
+    <ClCompile Include="submodules\AERA\AERA\main.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)/AERA_main.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)/AERA_main.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)/AERA_main.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)/AERA_main.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="submodules\AERA\AERA\test_mem.cpp" />
     <ClCompile Include="submodules\AERA\r_code\atom.cpp" />
     <ClCompile Include="submodules\AERA\r_code\atom.inline.cpp">
@@ -353,7 +356,12 @@
     <ClCompile Include="submodules\AERA\submodules\CoreLibrary\CoreLibrary\xml_parser.cpp" />
     <ClCompile Include="submodules\AERA\usr_operators\auto_focus_callback.cpp" />
     <ClCompile Include="find-dialog.cpp" />
-    <ClCompile Include="submodules\AERA\usr_operators\Callbacks\callbacks.cpp" />
+    <ClCompile Include="submodules\AERA\usr_operators\Callbacks\callbacks.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)/usr_operators_callbacks.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)/usr_operators_callbacks.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)/usr_operators_callbacks.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)/usr_operators_callbacks.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="submodules\AERA\usr_operators\Operators\operators.cpp" />
     <ClCompile Include="submodules\AERA\usr_operators\TestProgram\test_program.cpp" />
     <ClCompile Include="submodules\AERA\usr_operators\usr_operators.cpp" />
