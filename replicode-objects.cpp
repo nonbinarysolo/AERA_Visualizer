@@ -306,30 +306,18 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     return "cancel";
 
   // Get current state of AERA
-  //r_comp::Image* image = aera->getObjectsImage();   // Get objects from AERA's memory
-  r_comp::Metadata metadata = aera->getMetadata();  // Retreve metadata to interpret objects image
-
-  objects_ = aera->getMem()->get_objects_(true);
+  r_comp::Metadata metadata = aera->getMetadata();  // Retreve metadata to interpret objects
+  objects_ = aera->getMem()->get_objects_(true);    // Get objects directly from AERA's memory
   
   progress.setLabelText(getProgressLabelText("Retrieving objects"));
   QApplication::processEvents();
   if (progress.wasCanceled())
     return "cancel";
   
-  // Transfer objects from the compiler image to imageObjects.
-  //resized_vector<Code*> imageObjects;
-  //image->get_objects(_Mem::Get(), imageObjects);
-  //image->get_objects(aera->mem_, imageObjects);
-  
   // We update progress for 3 loops of imageObjects.size().
   progress.setLabelText(getProgressLabelText("Postprocessing code"));
   progress.setMaximum(objects_->size() * 3);
 
-  // Assign object labels. All internal references use OIDs, detail OIDs, or reference
-  // so the labels can be assigned more or less arbitrarily. If available, we'll use
-  // the name used in the seed program. If not,  this code follows the convention for
-  // runtime_out.txt (search for the macro `OUTPUT_LINE`).
-  
   // Use these names where available
   std::unordered_map<uint32, std::string> seedNames = aera->getSeedNames().symbols_;
 
@@ -353,55 +341,12 @@ string ReplicodeObjects::init(AERA_interface* aera, microseconds basePeriod, QPr
     assignLabel(*o, objectIdPerClass, metadata, seedNames);
   }
 
-  // Transfer imageObjects to objects_, unpacking and processing as needed.
-  // Imitate _Mem::load.
-  /*
-  for (uint32 i = 0; i < imageObjects.size(); ++i) {
-    Code* object = imageObjects[i];
-    int32 dummyLocation;
-    objects_->push_back(object, dummyLocation);
-    // We don't need to delete, so don't set the storage index.
-
-    switch (object->code(0).getDescriptor()) {
-    case Atom::MODEL:
-      _Mem::unpack_hlp(object);
-      r_exec::ModelBase::Get()->load(object);
-      break;
-    case Atom::COMPOSITE_STATE:
-      _Mem::unpack_hlp(object);
-      break;
-    case Atom::INSTANTIATED_PROGRAM: // refine the opcode depending on the inputs and the program type.
-      if (object->get_reference(0)->code(0).asOpcode() == Opcodes::Pgm) {
-
-        if (object->get_reference(0)->code(object->get_reference(0)->code(PGM_INPUTS).asIndex()).getAtomCount() == 0)
-          object->code(0) = Atom::InstantiatedInputLessProgram(object->code(0).asOpcode(), object->code(0).getAtomCount());
-      }
-      else
-        object->code(0) = Atom::InstantiatedAntiProgram(object->code(0).asOpcode(), object->code(0).getAtomCount());
-      break;
-    }
-
-    for (auto v = object->views_.begin(); v != object->views_.end(); ++v) {
-
-      // init hosts' member_set.
-      View* view = (View*)*v;
-      view->set_object(object);
-      Group* host = view->get_host();
-
-#if 0 // debug: host is NULL.
-      if (!host->load(view, object))
-        return false;
-#endif
-    }
-  }
-  */
-
   // Make sure to set this
   timeReference_ = aera->getStartTime();
 
   // Get the source code by decompiling the packed objects in objects_
   r_comp::Image packedImage;
-  packedImage.object_names_.symbols_ = seedNames;//image->object_names_.symbols_;
+  packedImage.object_names_.symbols_ = seedNames;
   packedImage.add_objects(*objects_, true);
 
   Decompiler decompiler;
@@ -463,6 +408,10 @@ static std::string makeSuffix(uint32 value) {
   return result;
 }
 
+// Assign object labels. All internal references use OIDs, detail OIDs, or reference
+// so the labels can be assigned more or less arbitrarily. If available, we'll use
+// the name used in the seed program. If not,  this code follows the convention for
+// runtime_out.txt (search for the macro `OUTPUT_LINE`).
 void ReplicodeObjects::assignLabel(
   Code* object, unordered_map<const Class*, uint16>& objectIdPerClass,
   const r_comp::Metadata& metadata, const std::unordered_map<uint32, std::string>& seedNames)
