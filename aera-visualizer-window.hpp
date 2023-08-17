@@ -62,6 +62,7 @@
 #include "views/explanation-log.hpp"
 #include "views/semantics.hpp"
 #include "views/player.hpp"
+#include "views/statistics.hpp"
 #include "views/text-output.hpp"
 #include "views/task-environment.hpp"
 
@@ -87,6 +88,7 @@ namespace aera_visualizer {
 class ExplanationLogView;
 class FindDialog;
 class PlayerView;
+class StatisticsView;
 class TextOutputView;
 class TaskEnvironmentView;
 
@@ -345,8 +347,10 @@ private:
   AERA_interface* aera_;
   ReplicodeObjects replicodeObjects_;
 
-  SemanticsView* semanticsView_;
+  
   PlayerView* playerView_;
+  SemanticsView* semanticsView_;
+  StatisticsView* statisticsView_;
   TextOutputView* textOutputView_;
   TaskEnvironmentView* taskEnvironmentView_;
 

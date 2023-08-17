@@ -333,6 +333,9 @@
     <ClCompile Include="views\task-environment.cpp">
       <Filter>views</Filter>
     </ClCompile>
+    <ClCompile Include="views\statistics.cpp">
+      <Filter>views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aera-event.hpp" />
@@ -740,6 +743,9 @@
       <Filter>views</Filter>
     </QtMoc>
     <QtMoc Include="views\task-environment.hpp">
+      <Filter>views</Filter>
+    </QtMoc>
+    <QtMoc Include="views\statistics.hpp">
       <Filter>views</Filter>
     </QtMoc>
   </ItemGroup>

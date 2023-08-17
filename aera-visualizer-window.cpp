@@ -2107,35 +2107,44 @@ void AeraVisualizerWindow::createDockWidgets() {
   // Configure docking settings
   setDockNestingEnabled(true);
   setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
-
-  // Set up the semantics view
-  semanticsView_ = new SemanticsView(this);
-  semanticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
-  semanticsView_->setObjectName("SemanticsView");
-  addDockWidget(Qt::LeftDockWidgetArea, semanticsView_);
   
+  // Set up the statistics view
+  statisticsView_ = new StatisticsView(this);
+  statisticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  statisticsView_->setObjectName("StatisticsView");
+
   // Set up the explanation log
   explanationLogView_ = new ExplanationLogView(this);
   explanationLogView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
   explanationLogView_->setObjectName("ExplanationLog");
-  addDockWidget(Qt::RightDockWidgetArea, explanationLogView_);
 
   // Set up the text view
   textOutputView_ = new TextOutputView(this);
   textOutputView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
   textOutputView_->setObjectName("TextOutputView");
-  addDockWidget(Qt::RightDockWidgetArea, textOutputView_);
+
+  // Set up the semantics view
+  semanticsView_ = new SemanticsView(this);
+  semanticsView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
+  semanticsView_->setObjectName("SemanticsView");
 
   // Set up the internal environment view
   taskEnvironmentView_ = new TaskEnvironmentView(this);
   taskEnvironmentView_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);
   taskEnvironmentView_->setObjectName("TaskEnvironmentView");
-  addDockWidget(Qt::LeftDockWidgetArea, taskEnvironmentView_);
 
   // Make the player a fixed dock widget so it's always at the bottom of the window
   playerView_ = new PlayerView(this);
   playerView_->setFeatures(QDockWidget::NoDockWidgetFeatures);
   playerView_->setObjectName("PlayerView");
+
+  // Add the widgets to the layout (The order these are assigned affects how
+  // they'll display by default, later items are added to the top of the layout)
+  addDockWidget(Qt::LeftDockWidgetArea, semanticsView_);
+  addDockWidget(Qt::LeftDockWidgetArea, taskEnvironmentView_);
+  addDockWidget(Qt::RightDockWidgetArea, textOutputView_);
+  addDockWidget(Qt::RightDockWidgetArea, explanationLogView_);
+  addDockWidget(Qt::RightDockWidgetArea, statisticsView_);
   addDockWidget(Qt::BottomDockWidgetArea, playerView_);
 }
 
@@ -2234,6 +2243,7 @@ void AeraVisualizerWindow::createMenus()
   viewMenu->addAction(semanticsView_->toggleViewAction());
   viewMenu->addAction(textOutputView_->toggleViewAction());
   viewMenu->addAction(taskEnvironmentView_->toggleViewAction());
+  viewMenu->addAction(statisticsView_->toggleViewAction());
 
   QMenu* findMenu = menuBar()->addMenu(tr("Fin&d"));
   findMenu->addAction(findAction_);
