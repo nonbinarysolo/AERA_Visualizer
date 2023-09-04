@@ -1,3 +1,4 @@
 [submodule "submodules/AERA"]
 	path = submodules/AERA
 	url = https://github.com/nonbinarysolo/AERA
+	branch = AERA-64
