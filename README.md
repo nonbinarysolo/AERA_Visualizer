@@ -13,13 +13,11 @@ See the file [CHANGELOG.md](https://github.com/IIIM-IS/AERA_Visualizer/blob/mast
 See the AERA [README.md](https://github.com/IIIM-IS/AERA/blob/master/README.md) for more information about AERA and Replicode.
 
 ## Set Up Instructions
-Because this branch is a big work in progress, it requires some extra set up. After checking this branch out, it's important to synchronize submodule URLs and then re-download the submodules so that they are switched to the right repo and branch:
+Because this branch is a big work in progress, I would recommend cloning the repo from scratch to take care of all the submodule changes. This can be done in a single command: `git clone --recursive https://github.com/nonbinarysolo/AERA_Visualizer --branch visualizer-expanded`. If you need to change branches, remember to synchronize and update submodules when you return:
 
-1. Clone this repo: `git clone https://github.com/nonbinarysolo/AERA_Visualizer.git`
-2. Change to its root directory: `cd AERA_Visualizer`
-3. Check out this branch: `git checkout visualizer-expanded`
-4. Synchronize submodule URLs: `git submodule sync`
-5. Update submodules: `git submodule update --init --recursive`
+1. Check out this branch: `git checkout visualizer-expanded`
+2. Synchronize submodule URLs: `git submodule sync`
+3. Update submodules: `git submodule update --init --recursive`
 
 
 ## Icon Attributions
