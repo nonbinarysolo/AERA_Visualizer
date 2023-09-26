@@ -282,9 +282,6 @@
     <ClCompile Include="submodules\AERA\AERA\test_mem.cpp">
       <Filter>AERA</Filter>
     </ClCompile>
-    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.cpp">
-      <Filter>AERA\TCP</Filter>
-    </ClCompile>
     <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.cpp">
       <Filter>AERA\TCP</Filter>
     </ClCompile>
@@ -332,6 +329,9 @@
     </ClCompile>
     <ClCompile Include="views\task-environment.cpp">
       <Filter>views</Filter>
+    </ClCompile>
+    <ClCompile Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_connection.cpp">
+      <Filter>AERA\TCP\AERA_Protobuf</Filter>
     </ClCompile>
     <ClCompile Include="graphics-items\reduction-marker-item.cpp">
       <Filter>graphics-items</Filter>
@@ -607,9 +607,6 @@
     <ClInclude Include="submodules\AERA\AERA\test_mem.h">
       <Filter>AERA</Filter>
     </ClInclude>
-    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_connection.h">
-      <Filter>AERA\TCP</Filter>
-    </ClInclude>
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\tcp_io_device.h">
       <Filter>AERA\TCP</Filter>
     </ClInclude>
@@ -641,6 +638,9 @@
       <Filter>AERA\TCP\AERA_Protobuf</Filter>
     </ClInclude>
     <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\utils.h">
+      <Filter>AERA\TCP\AERA_Protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="submodules\AERA\AERA\IODevices\TCP\AERA_Protobuf\tcp_connection.h">
       <Filter>AERA\TCP\AERA_Protobuf</Filter>
     </ClInclude>
     <ClInclude Include="graphics-items\reduction-marker-item.hpp">
