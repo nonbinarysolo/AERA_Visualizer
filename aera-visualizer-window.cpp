@@ -1711,8 +1711,9 @@ core::Timestamp AeraVisualizerWindow::aera_jumpToEnd() {
   playerView_->setAERARunning();
   setCursor(QCursor(Qt::BusyCursor)); // This may take a minute
 
-  // Run AERA to the end
-  aera_->run();
+  // Run AERA to the end and call processEvents to keep the visualizer from freezing
+  while (aera_->step())
+    QApplication::processEvents();
 
   // Update everything
   updateObjectsAndEvents();
