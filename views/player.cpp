@@ -157,16 +157,27 @@ PlayerView::PlayerView(AeraVisualizerWindow* mainWindow)
   labelLayout->addWidget(playTimeLabel_);
   labelLayout->addWidget(aeraTimeLabel_);
 
+  // Make a toolbar
+  playerControls_ = new QToolBar(this);
+
+  stepTogetherCheckbox_ = new AeraCheckbox("Step timeline with AERA", "StepTogether", mainWindow_, Qt::Checked);
+  playerControls_->addWidget(stepTogetherCheckbox_);
+  // TO DO: Add in a spinbox to control step length
+
   // Put it all together
   QHBoxLayout* playerLayout = new QHBoxLayout();
   playerLayout->addLayout(buttonLayout);
   playerLayout->addLayout(barLayout);
   playerLayout->addLayout(labelLayout);
 
+  QVBoxLayout* playerWithToolbarLayout = new QVBoxLayout();
+  playerWithToolbarLayout->addLayout(playerLayout);
+  playerWithToolbarLayout->addWidget(playerControls_);  
+
   // Put everything in a container
   QWidget* container = new QWidget();
   container->setObjectName("player_container");
-  container->setLayout(playerLayout);
+  container->setLayout(playerWithToolbarLayout);
   setWidget(container);
 }
 
@@ -242,6 +253,13 @@ void PlayerView::aera_stepFwdButtonClicked() {
   updateAERABar();
   updateLabels();
 
+  // If desired, step the visualizer forward
+  QSettings settings;
+  if (settings.value("StepTogether", Qt::Checked).toBool()) {
+    playTime_ = mainWindow_->vis_jumpToEnd();
+    setSliderToPlayTime();
+  }
+
   // Turn off the buttons if we've run to the end
   if (aeraTime_ >= timeReference_ + runTime_) {
     aeraStepButton_->setEnabled(false);
@@ -255,6 +273,13 @@ void PlayerView::aera_jumpToEndButtonClicked() {
   // Update the display
   updateAERABar();
   updateLabels();
+
+  // If desired, step the visualizer forward
+  QSettings settings;
+  if (settings.value("StepTogether", Qt::Checked).toBool()) {
+    playTime_ = mainWindow_->vis_jumpToEnd();
+    setSliderToPlayTime();
+  }
 
   // Turn off the buttons
   aeraStepButton_->setEnabled(false);
@@ -369,6 +394,8 @@ void PlayerView::setUIEnabled(bool enabled) {
 
   playTimeLabel_->setEnabled(enabled);
   aeraTimeLabel_->setEnabled(enabled);
+
+  stepTogetherCheckbox_->setEnabled(enabled);
 }
 
 void PlayerView::timerEvent(QTimerEvent* event)
