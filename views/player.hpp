@@ -59,9 +59,11 @@
 #include <QDockWidget>
 #include <QPushButton>
 #include <QToolButton>
+#include <QToolBar>
 #include <QSlider>
 #include <QLabel>
 #include <QProgressBar>
+#include "aera-checkbox.h"
 #include "../submodules/AERA/r_code/utils.h"
 #include "../replicode-objects.hpp"
 #include "../aera-visualizer-window.hpp"
@@ -183,6 +185,8 @@ private:
   QProgressBar* aeraBar_;
   ClickableLabel* playTimeLabel_;
   ClickableLabel* aeraTimeLabel_;
+  QToolBar* playerControls_;
+  AeraCheckbox* stepTogetherCheckbox_;
 
   int aeraBarSize = 2000;   // Big number for fine graduations
 };
