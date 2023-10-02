@@ -251,13 +251,14 @@ void PlayerView::aera_stepFwdButtonClicked() {
 
   // Update the display
   updateAERABar();
-  updateLabels();
+  updateLabels(); // Update the AERA label
 
-  // If desired, step the visualizer forward
+  // If desired, step the visualizer forward, too
   QSettings settings;
   if (settings.value("StepTogether", Qt::Checked).toBool()) {
     playTime_ = mainWindow_->vis_jumpToEnd();
     setSliderToPlayTime();
+    updateLabels(); // Update the Visualizer label
   }
 
   // Turn off the buttons if we've run to the end
@@ -272,13 +273,14 @@ void PlayerView::aera_jumpToEndButtonClicked() {
 
   // Update the display
   updateAERABar();
-  updateLabels();
+  updateLabels(); // Update the AERA label
 
-  // If desired, step the visualizer forward
+  // If desired, step the visualizer forward, too
   QSettings settings;
   if (settings.value("StepTogether", Qt::Checked).toBool()) {
     playTime_ = mainWindow_->vis_jumpToEnd();
     setSliderToPlayTime();
+    updateLabels(); // Update the Visualizer label
   }
 
   // Turn off the buttons
@@ -324,6 +326,9 @@ void PlayerView::updateLabels() {
   playTimeLabel_->setText(buffer);
 
   // Update the AERA time label
+  // TO DO: On the first step, the AERA time label briefly flashes a large negative number
+  //        before correcting to the right value. This is because aeraTime_ starts off at 0.
+  //        This should be fixed to make sure that aeraTime_ starts off at timeReference_
   if (showRelativeTime_)
     total_us = duration_cast<microseconds>(aeraTime_ - timeReference_).count();
   else
