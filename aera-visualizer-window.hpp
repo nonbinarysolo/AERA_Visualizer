@@ -255,6 +255,30 @@ public:
     return aera_->getCurrentTime();
   }
 
+  // These are used to set status messages for the labels in the status bar
+  void setAERAstatus(QString message, bool alert) {
+    AERAStatusLabel_->setText(message);
+
+    if (alert)
+      AERAStatusLabel_->setStyleSheet(statusStylesheet_red_);
+    else
+      AERAStatusLabel_->setStyleSheet(statusStylesheet_normal_);
+  }
+
+  void setOperatingModeStatus(QString message, int mode) {
+    operatingModeStatusLabel_->setText(message);
+
+    if (mode == 0) // Paused
+      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_normal_);
+    else if (mode == 1) // Working
+      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_green_);
+    else if (mode == 2) // Babbling
+      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_yellow_);
+    else if (mode == 3) // Error
+      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_red_);
+  }
+
+
 protected:
   /**
    * Set iNextStepEvent to the index in events_ of the next event that stepEvent will process.
@@ -309,6 +333,7 @@ private:
   void createActions();
   void createMenus();
   void createToolbars();
+  void createStatusBar();
 
   QToolBar* timelineControls_;
 
@@ -340,6 +365,33 @@ private:
   void setUIEnabled(bool enabled);
   
   void closeEvent(QCloseEvent* event) override;
+
+
+  // Status bar stylesheets
+  QString statusStylesheet_normal_ =
+    "QLabel {"
+    " border-top: 1px solid;"
+    "}";
+
+  QString statusStylesheet_green_ =
+    "QLabel {"
+    " border-top: 1px solid;"
+    " background-color: limegreen;"
+    " color: white;"
+    "}";
+
+  QString statusStylesheet_yellow_ =
+    "QLabel {"
+    " border-top: 1px solid;"
+    " background-color: khaki;"
+    "}";
+
+  QString statusStylesheet_red_ =
+    "QLabel {"
+    " border-top: 1px solid;"
+    " background-color: tomato;"
+    " color: white;"
+    "}";
   
 
   AERA_interface* aera_;
@@ -388,6 +440,9 @@ private:
   AeraCheckbox* instantiatedModelsCheckBox_;
   AeraCheckbox* predictedInstantiatedCompositeStatesCheckBox_;
   AeraCheckbox* requirementsCheckBox_;
+
+  QLabel* AERAStatusLabel_;
+  QLabel* operatingModeStatusLabel_;
 
   std::vector<std::shared_ptr<AeraEvent> > startupEvents_;
   std::vector<std::shared_ptr<AeraEvent> > events_;

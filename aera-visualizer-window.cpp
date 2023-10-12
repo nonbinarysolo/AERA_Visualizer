@@ -194,6 +194,7 @@ AeraVisualizerWindow::AeraVisualizerWindow()
   
   createDockWidgets();
   createMenus();
+  createStatusBar();
 
   auto centralWidget = new QWidget();
   auto centralLayout = new QVBoxLayout();
@@ -212,6 +213,12 @@ AeraVisualizerWindow::AeraVisualizerWindow()
 
   // Turn everything off until something's loaded in
   setUIEnabled(false);
+
+  // Indicate that AERA hasn't been started
+  setAERAstatus("AERA instance has not been started", true);
+  
+  // This feature isn't implemented yet so just leave this one empty
+  setOperatingModeStatus("", 0);
 }
 
 bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgressDialog& progress)
@@ -1994,6 +2001,9 @@ void AeraVisualizerWindow::loadNewSeed()
 
   // Enable the UI now that there's something to analyze
   setUIEnabled(true);
+
+  // Indicate that AERA is started
+  setAERAstatus("AERA running", false);
 }
 
 void AeraVisualizerWindow::updateObjectsAndEvents()
@@ -2343,6 +2353,18 @@ void AeraVisualizerWindow::createToolbars()
     mainScene_->setItemsVisible(ModelImdlPredictionEvent::EVENT_TYPE, state == Qt::Checked);  });
   timelineControls_->addWidget(requirementsCheckBox_);
 }
+
+
+void AeraVisualizerWindow::createStatusBar() {
+  AERAStatusLabel_ = new QLabel(this);
+  operatingModeStatusLabel_ = new QLabel(this);
+  QStatusBar* mainWindowStatusBar = new QStatusBar(this);
+
+  mainWindowStatusBar->insertPermanentWidget(0, AERAStatusLabel_, 1);            // Left side
+  mainWindowStatusBar->insertPermanentWidget(1, operatingModeStatusLabel_, 1);   // Right side
+  setStatusBar(mainWindowStatusBar);
+}
+
 
 void AeraVisualizerWindow::setUIEnabled(bool enabled) {
   // Actions
