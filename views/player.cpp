@@ -261,10 +261,11 @@ void PlayerView::aera_stepFwdButtonClicked() {
     updateLabels(); // Update the Visualizer label
   }
 
-  // Turn off the buttons if we've run to the end
+  // If we've run to the end turn off buttons and update the status message
   if (aeraTime_ >= timeReference_ + runTime_) {
     aeraStepButton_->setEnabled(false);
     aeraJumpToEndButton_->setEnabled(false);
+    mainWindow_->setAERAstatus("AERA run finished", 0);
   }
 }
 
@@ -283,9 +284,10 @@ void PlayerView::aera_jumpToEndButtonClicked() {
     updateLabels(); // Update the Visualizer label
   }
 
-  // Turn off the buttons
+  // Turn off buttons and indicate that AERA's run to the end
   aeraStepButton_->setEnabled(false);
   aeraJumpToEndButton_->setEnabled(false);
+  mainWindow_->setAERAstatus("AERA run finished", 0);
 }
 
 void PlayerView::playSliderValueChanged(int value)
