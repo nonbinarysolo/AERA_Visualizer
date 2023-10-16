@@ -216,7 +216,7 @@ AeraVisualizerWindow::AeraVisualizerWindow()
   setAERAstatus("AERA instance has not been started", true);
   
   // This feature isn't implemented yet so just leave this one empty
-  setOperatingModeStatus("", 0);
+  setOperatingModeStatus("", PAUSED);
 }
 
 bool AeraVisualizerWindow::addEvents(const string& runtimeOutputFilePath, QProgressDialog& progress)
