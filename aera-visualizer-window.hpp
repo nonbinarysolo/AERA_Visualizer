@@ -265,17 +265,25 @@ public:
       AERAStatusLabel_->setStyleSheet(statusStylesheet_normal_);
   }
 
-  void setOperatingModeStatus(QString message, int mode) {
+  enum OperatingMode { PAUSED, WORKING, BABBLING, ERR };
+
+  void setOperatingModeStatus(QString message, OperatingMode mode) {
     operatingModeStatusLabel_->setText(message);
 
-    if (mode == 0) // Paused
-      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_normal_);
-    else if (mode == 1) // Working
-      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_green_);
-    else if (mode == 2) // Babbling
-      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_yellow_);
-    else if (mode == 3) // Error
-      operatingModeStatusLabel_->setStyleSheet(statusStylesheet_red_);
+    switch (mode) {
+      case PAUSED:
+        operatingModeStatusLabel_->setStyleSheet(statusStylesheet_normal_);
+        break;
+      case WORKING:
+        operatingModeStatusLabel_->setStyleSheet(statusStylesheet_green_);
+        break;
+      case BABBLING:
+        operatingModeStatusLabel_->setStyleSheet(statusStylesheet_yellow_);
+        break;
+      case ERR:
+        operatingModeStatusLabel_->setStyleSheet(statusStylesheet_red_);
+        break;
+    }
   }
 
 
