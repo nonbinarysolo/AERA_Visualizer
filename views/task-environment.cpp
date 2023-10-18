@@ -104,9 +104,16 @@ namespace aera_visualizer {
 		dataLayout->addWidget(secondDataLabel_, 1, 1);
 		dataLayout->addWidget(thirdDataLabel_, 2, 1);
 
+		// Test stream receiver
+		//QMediaPlayer* player = new QMediaPlayer;
+		video_ = new QVideoWidget;
+		//player->setMedia(QUrl("http://http://localhost:1234/mjpeg"));
+		//player->setVideoOutput(video);
+		video_->show();
+		//player->play();
 
 		QVBoxLayout* layout = new QVBoxLayout();
-		layout->addWidget(canvas_);
+		layout->addWidget(video_); //canvas_);
 		layout->addLayout(dataLayout);
 		container->setLayout(layout);
 

@@ -57,6 +57,8 @@
 
 #include <QDockWidget>
 #include <QBrush>
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimediaWidgets/QVideoWidget>
 
 #include "../aera-visualizer-window.hpp"
 #include "../replicode-objects.hpp"
@@ -155,6 +157,9 @@ private:
 	QLabel* firstDataLabel_;
 	QLabel* secondDataLabel_;
 	QLabel* thirdDataLabel_;
+
+	QVideoWidget* video_;
+	QMediaPlayer* player_;
 };
 }
 
