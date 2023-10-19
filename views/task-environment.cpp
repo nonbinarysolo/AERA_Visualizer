@@ -105,12 +105,7 @@ namespace aera_visualizer {
 		dataLayout->addWidget(thirdDataLabel_, 2, 1);
 
 		// Test stream receiver
-		//QMediaPlayer* player = new QMediaPlayer;
-		video_ = new QVideoWidget;
-		//player->setMedia(QUrl("http://http://localhost:1234/mjpeg"));
-		//player->setVideoOutput(video);
-		video_->show();
-		//player->play();
+		video_ = new QVideoWidget();
 
 		QVBoxLayout* layout = new QVBoxLayout();
 		layout->addWidget(video_); //canvas_);
@@ -123,6 +118,23 @@ namespace aera_visualizer {
 	void TaskEnvironmentView::setAERA(AERA_interface* aera) {
 		// Get the updated information
 		aera_ = aera;
+
+		// Connect to TCP if needed
+		if (aera_->getSettings()->io_device_ == "tcp_io_device") { // && false) {
+			identifier_ = "WebotsMJPEG";
+
+			// Hardocoded Webots stream for now
+			// TO DO: Don't attempt connection while Webots is starting - that'll crash it immediately
+			// TO DO: Have to click connect button on /index.html or Webots crashes immediately
+			//        Need to make GET request like ws:localhost:1234/ (see Firefox Network tab) to start MJPEG stream
+			QNetworkRequest request = QNetworkRequest(QUrl("http://localhost:1234/mjpeg"));
+			QMediaContent* content = new QMediaContent(request);
+			QMediaPlayer* player = new QMediaPlayer;
+			player->setMedia(*content);
+			player->setVideoOutput(video_);
+			video_->show();
+			player->play();
+		}
 
 		// Refresh the drawing and data output
 		refresh();
