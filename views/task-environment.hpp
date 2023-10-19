@@ -57,8 +57,8 @@
 
 #include <QDockWidget>
 #include <QBrush>
-#include <QtMultimedia/QMediaPlayer>
-#include <QtMultimediaWidgets/QVideoWidget>
+#include <QMediaPlayer>
+#include <QVideoWidget>
 
 #include "../aera-visualizer-window.hpp"
 #include "../replicode-objects.hpp"
