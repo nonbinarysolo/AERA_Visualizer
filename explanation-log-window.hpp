@@ -93,7 +93,6 @@ private slots:
   void textBrowserAnchorClicked(const QUrl& url);
 
 private:
-  ReplicodeObjects* replicodeObjects_;
   /**
    * ExplanationLogWindow::TextBrowser extends QTextBrowser so that we can override its
    * mouseMoveEvent.
@@ -112,7 +111,7 @@ private:
   friend TextBrowser;
 
   AeraVisualizerWindow* mainWindow_;
-  ReplicodeObjects replicodeObjects_;
+  ReplicodeObjects* replicodeObjects_;
 
   // TODO: We should be able to use textBrowser_ to append HTML.
   QString html_;
