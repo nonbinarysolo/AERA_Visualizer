@@ -162,8 +162,8 @@ string ReplicodeObjects::init(const string& userClassesFilePath, const string& d
 
   if (!compiler.compile(&preprocessedIn, &image, &metadata, error, false)) {
     auto iError = (size_t)preprocessedIn.tellg();
-    auto nBeforeError = min(iError, 50);
-    auto nAfterError = min(preprocessedIn.str().size() - iError, 50);
+    auto nBeforeError = min(iError, (long unsigned int) 50);
+    auto nAfterError = min(preprocessedIn.str().size() - iError, (long unsigned int) 50);
     string codeBefore = preprocessedIn.str().substr(iError - nBeforeError, nBeforeError);
     string codeAfter = preprocessedIn.str().substr(iError, nBeforeError);
     return codeBefore + "\n<< " + error + "\n" + codeAfter;
