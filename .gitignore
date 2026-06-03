@@ -4,6 +4,7 @@
 /GeneratedFiles/*
 /Win32/*
 /x64/*
+build/
 
 # Visual Studio user files
 *.vs/
@@ -14,3 +15,4 @@
 # Ignore log files
 *.log
 *.txt
+!CMakeLists.txt
