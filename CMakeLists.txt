@@ -268,7 +268,7 @@ target_link_libraries(AeraVisualizer
         # 24.04 default) includes it in libstdc++ automatically; the explicit
         # link is harmless but generates a warning on newer toolchains.
         # Uncomment if building on an older GCC:
-        # stdc++fs
+        stdc++fs
         $<$<PLATFORM_ID:Linux>:${CMAKE_DL_LIBS}>
         $<$<PLATFORM_ID:Windows>:wsock32>
 )
@@ -284,6 +284,7 @@ else()
         -Wextra
         -Wno-unused-parameter
         -Wno-reorder
+        -fpermissive
     )
 endif()
 
