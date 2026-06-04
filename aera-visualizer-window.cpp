@@ -2051,7 +2051,7 @@ void AeraVisualizerWindow::loadNewSeed()
   else
     preferences.setValue("settingsFilePath", settingsFilePath);
     */
-  QString settingsFilePath = "settings.xml";
+  QString settingsFilePath = "../settings.xml";
 
   // Load the settings
   Settings settings;
