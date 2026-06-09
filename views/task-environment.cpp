@@ -116,13 +116,11 @@ namespace aera_visualizer {
 	void TaskEnvironmentView::setAERA(AERA_interface* aera) {
 		// Get the updated information
 		aera_ = aera;
-
-		// Refresh the drawing and data output
-		refresh();
 	}
 
+	// Don't run this until `(cmd ready [::] 1)` in the seed because the memory identifer isn't set until then
 	void TaskEnvironmentView::refresh() {
-		identifier_ = aera_->getMem()->getIdentifier();
+		identifier_ = aera_->getMem()->getIdentifier(); 	// This will break if called before the seed is ready
 
 		// Use identifier_ to decide what to show
 		if (identifier_ == "ball") {
