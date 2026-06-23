@@ -51,7 +51,7 @@ add_compile_definitions(
     WITH_DETAIL_OID
     EXECUTIVE_EXPORTS
     CORELIBRARY_EXPORTS
-    # ENABLE_PROTOBUF
+    ENABLE_PROTOBUF
 )
 
 # ---------------------------------------------------------------------------
@@ -271,6 +271,7 @@ target_link_libraries(AeraVisualizer
         stdc++fs
         $<$<PLATFORM_ID:Linux>:${CMAKE_DL_LIBS}>
         $<$<PLATFORM_ID:Windows>:wsock32>
+        libprotobuf.a
 )
 
 # ---------------------------------------------------------------------------

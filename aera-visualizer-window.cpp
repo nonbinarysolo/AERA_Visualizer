@@ -1169,6 +1169,21 @@ Timestamp AeraVisualizerWindow::stepEvent(Timestamp maximumTime)
         ++iNextEvent_;
         return stepEvent(maximumTime);
       }
+      
+      /*
+      // Only handle fact mk.val auto-focus events; skip other object types.
+      if (!autoFocusEvent->fromObject_ ||
+          autoFocusEvent->fromObject_->references_size() == 0 ||
+          autoFocusEvent->fromObject_->code(0).asOpcode() != Opcodes::Fact) {
+          ++iNextEvent_;
+          return stepEvent(maximumTime);
+      }
+      auto innerObj = autoFocusEvent->fromObject_->get_reference(0);
+      if (!innerObj || innerObj->code(0).asOpcode() != Opcodes::MkVal) {
+          ++iNextEvent_;
+          return stepEvent(maximumTime);
+      }
+          */
 
       newItem = new AutoFocusFactItem(autoFocusEvent, replicodeObjects_, scene);
 
@@ -1176,12 +1191,12 @@ Timestamp AeraVisualizerWindow::stepEvent(Timestamp maximumTime)
       auto fromObjectItem = scene->getAeraGraphicsItem(autoFocusEvent->fromObject_);
       if (fromObjectItem)
         scene->addArrow(fromObjectItem, newItem);
-
-      auto mkVal = autoFocusEvent->fromObject_->get_reference(0);
-      if (essencePropertyObject_ && mkVal->references_size() >= 2 && mkVal->get_reference(1) == essencePropertyObject_)
-        visible = ((nonSimulationsCheckBox_->checkState() == Qt::Checked) && (essenceFactsCheckBox_->checkState() == Qt::Checked));
-      else
-        visible = (nonSimulationsCheckBox_->checkState() == Qt::Checked);
+      
+        auto mkVal = autoFocusEvent->fromObject_->get_reference(0);
+        if (essencePropertyObject_ && mkVal->references_size() >= 2 && mkVal->get_reference(1) == essencePropertyObject_)
+          visible = ((nonSimulationsCheckBox_->checkState() == Qt::Checked) && (essenceFactsCheckBox_->checkState() == Qt::Checked));
+        else
+          visible = (nonSimulationsCheckBox_->checkState() == Qt::Checked);
     }
     else if (event->eventType_ == ModelMkValPredictionReduction::EVENT_TYPE) {
       auto reductionEvent = (ModelMkValPredictionReduction*)event;
